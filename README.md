@@ -7,16 +7,25 @@
   
   [![Laravel](https://img.shields.io/badge/Laravel-11.31-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
   [![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+  [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docker.com)
   [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4o-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com)
   [![TailwindCSS](https://img.shields.io/badge/Tailwind-3.1-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+
+  ### 🌐 Live Deployments
+  
+  **Production:** [https://ltucbot.up.railway.app/](https://ltucbot.up.railway.app/)  
+  **Backup:** [https://ltucbot.onrender.com/](https://ltucbot.onrender.com/)  
+  **Database:** Hosted on [Clever Cloud](https://clever-cloud.com) MySQL
 </div>
 
 ## 📋 Table of Contents
 
--   [Overview](#-overview)
+-   [About the Project](#-about-the-project)
+-   [Why Laravel over Python?](#-why-laravel-over-python)
 -   [Features](#-features)
 -   [Technologies](#-technologies)
 -   [Installation](#-installation)
+-   [Docker Deployment](#-docker-deployment)
 -   [Configuration](#-configuration)
 -   [Usage](#-usage)
 -   [File Processing](#-file-processing)
@@ -24,13 +33,65 @@
 -   [Contributing](#-contributing)
 -   [License](#-license)
 
-## 🌟 Overview
+## 🚀 About the Project
 
 LTUC AI Assistant is a cutting-edge educational platform that leverages OpenAI's GPT-4o model to provide intelligent academic support. Built with Laravel 11 and modern web technologies, it offers students 24/7 access to an AI-powered learning companion capable of processing multiple file formats and providing comprehensive educational assistance.
 
 ### 🎯 Mission
 
-Transform the educational experience by providing instant, intelligent, and personalized academic support through advanced AI technology.
+Transform the educational experience by providing instant, intelligent, and personalized academic support through advanced AI technology, while maintaining a robust, scalable, and user-friendly web application architecture.
+
+### 🌟 Project Highlights
+
+- **Multi-Platform Deployment**: Running on Railway and Render for high availability
+- **Cloud Database**: MySQL database hosted on Clever Cloud for reliability
+- **Enterprise-Grade Architecture**: Built with Laravel for scalability and maintainability
+- **Modern UI/UX**: Responsive design with TailwindCSS and mobile-first approach
+- **Advanced File Processing**: Supports 30+ file formats with intelligent content extraction
+- **Real-time Chat**: Persistent chat history with user authentication
+
+## 🤔 Why Laravel over Python?
+
+While we acknowledge that **Python is the dominant language in AI and machine learning** ecosystems, we chose Laravel/PHP for this educational platform for several compelling reasons:
+
+### 🔐 **Superior Authentication & User Management**
+- **Built-in Laravel Breeze**: Complete authentication system out of the box
+- **Robust Session Management**: Secure user sessions and CSRF protection
+- **Role-Based Access Control**: Easy implementation of user roles and permissions
+- **Password Security**: Built-in hashing, password reset, and email verification
+
+### 🏗️ **Rapid Web Development**
+- **MVC Architecture**: Clean, organized code structure for large applications
+- **Eloquent ORM**: Intuitive database interactions with relationships
+- **Blade Templating**: Powerful templating engine for dynamic UIs
+- **Artisan CLI**: Hundreds of built-in commands for development efficiency
+
+### 🌐 **Enterprise Web Features**
+- **Advanced Routing**: RESTful routing with middleware and route caching
+- **Database Migrations**: Version control for database schema changes
+- **Queue System**: Background job processing for file handling
+- **Caching**: Redis/Memcached integration for performance
+- **File Storage**: Seamless cloud storage integration (AWS S3, etc.)
+
+### 📊 **Production-Ready Infrastructure**
+- **Mature Ecosystem**: 10+ years of enterprise-grade packages
+- **Horizontal Scaling**: Easy deployment across multiple servers
+- **Error Handling**: Comprehensive logging and debugging tools
+- **Security**: Built-in protection against OWASP top 10 vulnerabilities
+- **Performance**: Optimized for web applications with request lifecycle optimization
+
+### 🔧 **Development Experience**
+- **Hot Reloading**: Vite integration for instant frontend updates
+- **Testing Suite**: PHPUnit integration with feature and unit testing
+- **Package Management**: Composer for PHP and npm for frontend dependencies
+- **API Development**: Laravel Sanctum for API authentication
+
+### 💡 **Why Not Pure Python for Web?**
+While frameworks like Django and FastAPI are excellent, Laravel provides:
+- **Faster MVP Development**: Pre-built components for common web features
+- **Better Documentation**: Extensive, beginner-friendly documentation
+- **Hosting Flexibility**: Runs on shared hosting to enterprise infrastructure
+- **Community Support**: Large, active community with extensive package ecosystem
 
 ## ✨ Features
 
@@ -49,6 +110,7 @@ Transform the educational experience by providing instant, intelligent, and pers
 -   **Code Files**: PHP, JS, Python, Java, C++, HTML, CSS, JSON, XML
 -   **Data Formats**: JSON, XML, YAML, SQL
 -   **Archives**: ZIP (content extraction)
+-   **Notebooks**: Jupyter notebooks with cell-by-cell analysis
 
 ### 🔧 Advanced Features
 
@@ -56,42 +118,115 @@ Transform the educational experience by providing instant, intelligent, and pers
 -   **Code Block Rendering** - Syntax-highlighted code display with copy functionality
 -   **Markdown Support** - Rich text formatting and rendering
 -   **File Upload** - Drag-and-drop interface with multiple file support
--   **Responsive Design** - Mobile-first, modern UI with Tailwind CSS
+-   **Responsive Design** - Mobile-first, modern UI with TailwindCSS
 -   **User Authentication** - Secure login and registration system
+-   **Chat History** - Persistent conversation storage with user accounts
+-   **Real-time Processing** - Instant file analysis and AI responses
 
 ### 🎨 User Experience
 
 -   **Dark Theme Code Blocks** - Professional ChatGPT-like appearance
--   **Gradient Headers** - Beautiful pink-to-purple gradients
+-   **Gradient Headers** - Beautiful pink-to-purple gradients matching LTUC branding
 -   **Interactive Elements** - Hover effects and smooth animations
--   **Real-time Processing** - Instant file analysis and AI responses
+-   **Mobile Optimized** - Perfect mobile experience with responsive design
 -   **Copy to Clipboard** - Easy code and text copying functionality
+-   **Demo Mode** - Public demo for non-authenticated users
 
 ## 🛠 Technologies
 
-### Backend
+### Backend Framework
 
--   **Laravel 11.31** - Modern PHP framework
--   **PHP 8.2+** - Latest PHP features and performance
--   **MySQL/SQLite** - Database management
--   **OpenAI PHP Client** - Official OpenAI API integration
+-   **Laravel 11.31** - Modern PHP framework with latest features
+-   **PHP 8.2+** - Latest PHP features and performance improvements
+-   **MySQL** - Production database (hosted on Clever Cloud)
+-   **SQLite** - Development database option
+-   **OpenAI PHP Client 0.15** - Official OpenAI API integration
 
-### Frontend
+### Frontend Technologies
 
--   **Tailwind CSS 3.1** - Utility-first CSS framework
+-   **TailwindCSS 3.1** - Utility-first CSS framework
 -   **Alpine.js 3.4** - Lightweight JavaScript framework
 -   **Vite 6.0** - Fast build tool and dev server
 -   **FontAwesome 6.5** - Professional icon library
+-   **Inter Font** - Modern typography
 
 ### File Processing Libraries
 
--   **PHPOffice/PhpSpreadsheet** - Excel and spreadsheet processing
--   **PHPOffice/PHPWord** - Word document processing
--   **Smalot/PdfParser** - PDF content extraction
--   **Spatie/PDF-to-Text** - Alternative PDF processing
--   **League/CommonMark** - Markdown parsing and rendering
+-   **PHPOffice/PhpSpreadsheet 4.5** - Excel and spreadsheet processing
+-   **PHPOffice/PHPWord 1.4** - Word document processing
+-   **Smalot/PdfParser 2.12** - PDF content extraction
+-   **Spatie/PDF-to-Text 1.54** - Alternative PDF processing
+-   **League/CommonMark 2.7** - Markdown parsing and rendering
 
-## 🚀 Installation
+### Development Tools
+
+-   **Laravel Breeze 2.3** - Authentication scaffolding
+-   **Laravel Pint 1.13** - Code style fixer
+-   **PHPUnit 11.0** - Testing framework
+-   **Faker** - Test data generation
+
+## � Docker Deployment
+
+The project includes comprehensive Docker configuration optimized for production deployment on Railway and Render.
+
+### Multi-Stage Dockerfile
+
+Our Dockerfile uses a multi-stage build process:
+
+1. **Stage 1: Asset Building**
+   ```dockerfile
+   FROM node:20 AS assets
+   # Builds Vite assets optimally
+   ```
+
+2. **Stage 2: PHP Application**
+   ```dockerfile
+   FROM php:8.3-cli
+   # Installs PHP extensions and dependencies
+   ```
+
+### Key Docker Features
+
+- **PHP 8.3** with all required extensions (GD, ZIP, PDO, MySQL, BCMath, Intl)
+- **Composer 2** for dependency management
+- **File Upload Support** - Configured for 10MB max file size
+- **Production Optimized** - No dev dependencies in final image
+- **Multi-platform** - Supports ARM64 and AMD64 architectures
+
+### Quick Docker Commands
+
+```bash
+# Build the image
+docker build -t ltuc-ai-assistant .
+
+# Run locally
+docker run -p 10000:10000 --env-file .env ltuc-ai-assistant
+
+# Access application
+http://localhost:10000
+```
+
+### Production Deployment
+
+#### Railway Deployment
+1. Connect your GitHub repository to Railway
+2. Set environment variables (OpenAI API key, database credentials)
+3. Railway automatically detects Dockerfile and deploys
+4. Access at: https://ltucbot.up.railway.app/
+
+#### Render Deployment
+1. Create new Web Service on Render
+2. Connect GitHub repository
+3. Render builds using Dockerfile
+4. Access at: https://ltucbot.onrender.com/
+
+#### Database Setup (Clever Cloud)
+1. Create MySQL database on Clever Cloud
+2. Copy connection credentials
+3. Update environment variables on Railway/Render
+4. Run migrations: `php artisan migrate`
+
+## �🚀 Installation
 
 ### Prerequisites
 
@@ -104,8 +239,8 @@ Transform the educational experience by providing instant, intelligent, and pers
 ### Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/your-username/ltuc-ai-assistant.git
-cd ltuc-ai-assistant
+git clone https://github.com/osamaalkhazali/LTUCBot.git
+cd LTUCBot
 ```
 
 ### Step 2: Install Dependencies
@@ -225,37 +360,49 @@ http://localhost:10000
 
 ### Environment Variables
 
-Create your `.env` file with the following essential configurations:
+Create your `.env` file with the following configurations:
 
 ```env
 # Application
 APP_NAME="LTUC AI Assistant"
-APP_ENV=local
+APP_ENV=production
 APP_KEY=base64:your-generated-key
-APP_DEBUG=true
-APP_URL=http://localhost:8000
+APP_DEBUG=false
+APP_URL=https://ltucbot.up.railway.app
 
-# Database
+# Database (Clever Cloud MySQL)
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
+DB_HOST=your-clever-cloud-host
 DB_PORT=3306
-DB_DATABASE=ltuc_ai
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+DB_DATABASE=your-database-name
+DB_USERNAME=your-username
+DB_PASSWORD=your-password
 
 # OpenAI Configuration
 OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_ORGANIZATION=your_org_id (optional)
+OPENAI_ORGANIZATION=your_org_id_optional
 
 # Mail Configuration
 MAIL_MAILER=smtp
-MAIL_HOST=mailpit
-MAIL_PORT=1025
-MAIL_USERNAME=null
-MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
-MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-email
+MAIL_PASSWORD=your-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@ltucbot.com"
 MAIL_FROM_NAME="${APP_NAME}"
+
+# Session Configuration
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+
+# Cache Configuration
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync
+
+# File Upload Limits
+UPLOAD_MAX_FILESIZE=10M
+POST_MAX_SIZE=10M
 ```
 
 ### OpenAI API Setup
@@ -267,44 +414,47 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 ### File Upload Configuration
 
-Adjust PHP settings for large file uploads in `php.ini`:
+The application is configured to handle files up to 10MB. Adjust in Docker or PHP settings:
 
 ```ini
-upload_max_filesize = 50M
-post_max_size = 50M
+upload_max_filesize = 10M
+post_max_size = 10M
 max_execution_time = 300
 memory_limit = 512M
 ```
 
 ## 📖 Usage
 
+### Access the Application
+
+1. **Production**: [https://ltucbot.up.railway.app/](https://ltucbot.up.railway.app/)
+2. **Demo Mode**: Try the chatbot without registration
+3. **Full Features**: Register for persistent chat history and file uploads
+
 ### Basic Interaction
 
-1. **Access the Application**
+1. **Register/Login**
+   - Create account for full features
+   - Or use demo mode for quick testing
 
-    ```
-    http://localhost:8000
-    ```
-
-2. **Register/Login**
-
-    - Create a new account or login with existing credentials
-    - Access the chatbot at `/ltuc/chatbot`
-
-3. **Start Chatting**
-    - Type questions in the chat interface
-    - Upload files by dragging and dropping or clicking the upload area
-    - Receive AI-powered responses with formatted code blocks
+2. **Start Chatting**
+   - Type questions in the chat interface
+   - Upload files for analysis
+   - View formatted responses with syntax highlighting
 
 ### File Upload Examples
 
-```php
-// Upload multiple files
-- Documents: research.pdf, notes.docx
-- Code files: script.php, styles.css
-- Images: diagram.png, chart.jpg
-- Spreadsheets: data.xlsx, grades.csv
-```
+- **Documents**: Upload PDFs, Word docs, spreadsheets
+- **Code Files**: Analyze Python, PHP, JavaScript, etc.
+- **Images**: Extract text and analyze visual content
+- **Data Files**: Process CSV, JSON, XML files
+
+### Chat Features
+
+- **Persistent History**: All conversations saved to your account
+- **Multiple Chats**: Start new conversations anytime
+- **File Attachments**: Each message can include multiple files
+- **Mobile Responsive**: Perfect experience on all devices
 
 ### Sample Interactions
 
@@ -424,169 +574,58 @@ Professional dark theme with gradient headers:
 
 ## 🤝 Contributing
 
-We welcome contributions! Please follow these steps:
+### Development Workflow
 
 1. **Fork the Repository**
-2. **Create Feature Branch**
-    ```bash
-    git checkout -b feature/amazing-feature
-    ```
-3. **Commit Changes**
-    ```bash
-    git commit -m 'Add amazing feature'
-    ```
-4. **Push to Branch**
-    ```bash
-    git push origin feature/amazing-feature
-    ```
-5. **Open Pull Request**
+2. **Create Feature Branch**: `git checkout -b feature/amazing-feature`
+3. **Make Changes**: Follow PSR-12 coding standards
+4. **Run Tests**: Ensure all tests pass
+5. **Submit Pull Request**: With detailed description
 
-### Development Guidelines
+### Code Standards
 
--   Follow PSR-12 coding standards
--   Write comprehensive tests
--   Update documentation for new features
--   Ensure responsive design compatibility
--   Test file processing with various formats
+- **PSR-12**: PHP coding standard compliance
+- **Laravel Conventions**: Follow Laravel best practices
+- **Documentation**: Comment complex functions
+- **Testing**: Write tests for new features
 
-### Code Style
+### Setting up Development Environment
 
 ```bash
-# PHP Code Style (Laravel Pint)
-./vendor/bin/pint
+# Install development dependencies
+composer install --dev
+npm install --dev
 
-# Format JavaScript/CSS
-npm run lint
+# Set up testing database
+php artisan migrate --env=testing
+
+# Run development server with debugging
+php artisan serve --env=local
 ```
 
-## 📋 Requirements
+## � License
 
-### System Requirements
-
--   **PHP**: 8.2 or higher
--   **MySQL**: 5.7+ or **SQLite**: 3.8+
--   **Node.js**: 18.0 or higher
--   **Composer**: 2.0 or higher
--   **OpenAI API**: Valid API key with sufficient credits
-
-### PHP Extensions
-
--   OpenSSL
--   PDO
--   Mbstring
--   Tokenizer
--   XML
--   Ctype
--   JSON
--   BCMath
--   GD or Imagick (for image processing)
--   ZipArchive (for ZIP file processing)
-
-### Optional Dependencies
-
--   **ImageMagick** - Enhanced PDF to image conversion
--   **Tesseract OCR** - Improved text extraction from images
--   **Poppler Utils** - Better PDF processing
-
-## 🔒 Security
-
-### Security Features
-
--   **Input Validation** - Comprehensive file and input sanitization
--   **File Type Verification** - MIME type and extension validation
--   **Size Limits** - Configurable upload size restrictions
--   **CSRF Protection** - Laravel's built-in CSRF protection
--   **Authentication** - Secure user authentication system
-
-### API Security
-
--   **Environment Variables** - Secure API key storage
--   **Rate Limiting** - Configurable API request limits
--   **Error Handling** - Secure error messages without sensitive data exposure
-
-## 📊 Performance
-
-### Optimization Features
-
--   **Lazy Loading** - Efficient resource loading
--   **Asset Minification** - Compressed CSS/JS files
--   **Database Indexing** - Optimized database queries
--   **Caching** - Laravel's built-in caching system
--   **Image Optimization** - Automatic image compression
-
-### Monitoring
-
--   **Laravel Telescope** - Available for development debugging
--   **Error Logging** - Comprehensive error tracking
--   **Performance Metrics** - Response time monitoring
-
-## 📚 Documentation
-
-### Additional Resources
-
--   [Laravel Documentation](https://laravel.com/docs)
--   [OpenAI API Documentation](https://platform.openai.com/docs)
--   [Tailwind CSS Documentation](https://tailwindcss.com/docs)
--   [PHPOffice Documentation](https://phpoffice.github.io/)
-
-### API Reference
-
--   **Chat Endpoint**: `/ltuc/chatbot`
--   **File Upload**: Multi-part form data with files array
--   **Response Format**: JSON with `reply` and `html_reply` fields
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**OpenAI API Errors:**
-
-```bash
-# Check API key configuration
-php artisan config:clear
-php artisan config:cache
-```
-
-**File Upload Issues:**
-
-```bash
-# Check PHP configuration
-php --ini
-# Verify upload_max_filesize and post_max_size
-```
-
-**Asset Building Problems:**
-
-```bash
-# Clear and rebuild assets
-npm run build
-php artisan view:clear
-```
-
-### Debug Mode
-
-Enable debug mode in `.env` for detailed error messages:
-
-```env
-APP_DEBUG=true
-LOG_LEVEL=debug
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 ## 🙏 Acknowledgments
 
--   **OpenAI** - For providing advanced AI capabilities
--   **Laravel Team** - For the excellent PHP framework
--   **Tailwind CSS** - For the utility-first CSS framework
--   **PHPOffice** - For comprehensive file processing libraries
--   **FontAwesome** - For beautiful icons and symbols
+- **OpenAI** for providing the GPT-4o API
+- **Laravel Community** for the amazing framework and packages
+- **Railway & Render** for reliable hosting platforms
+- **Clever Cloud** for managed MySQL database
+- **LTUC** for supporting innovative educational technology
+
+## � Support
+
+- **Issues**: [GitHub Issues](https://github.com/osamaalkhazali/LTUCBot/issues)
+- **Documentation**: This README and inline code comments
+- **Live Demo**: [https://ltucbot.up.railway.app/](https://ltucbot.up.railway.app/)
 
 ---
 
 <div align="center">
-  <p><strong>Built with ❤️ for Better Education</strong></p>
+  <p><strong>Built with ❤️ for Education</strong></p>
+  <p>© 2025 LTUC AI Assistant | Powered by Laravel & OpenAI</p>
+</div>
   <p>© 2025 LTUC AI Assistant. All rights reserved.</p>
 </div>
