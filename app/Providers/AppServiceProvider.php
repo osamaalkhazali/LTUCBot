@@ -23,8 +23,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        // Force HTTPS in production
-        if (config('app.env') === 'production') {
+        // Force HTTPS in production or on Railway/Render
+        if (config('app.env') === 'production' || 
+            isset($_ENV['RAILWAY_ENVIRONMENT']) || 
+            isset($_ENV['RENDER']) ||
+            str_contains(config('app.url'), 'railway.app') ||
+            str_contains(config('app.url'), 'onrender.com')) {
             URL::forceScheme('https');
         }
     }
