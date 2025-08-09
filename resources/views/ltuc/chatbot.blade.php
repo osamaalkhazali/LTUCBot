@@ -113,6 +113,25 @@
             border-radius: 3px;
         }
 
+        /* Sidebar chat history scrollbar */
+        .sidebar-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-track {
+            background: #F9FAFB;
+            border-radius: 4px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 4px;
+        }
+
+        .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+
         /* quick actions removed */
 
         .file-chip {
@@ -818,6 +837,95 @@
                 font-size: 12px;
             }
         }
+
+        /* Chat History Styles */
+        .chat-history-item {
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 1px;
+        }
+
+        .chat-history-item:last-child {
+            border-bottom: none;
+        }
+
+        .chat-history-item.active {
+            background-color: #e2e8f0;
+        }
+
+        .chat-history-item.active .font-medium {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .chat-history-item:hover {
+            background-color: #f1f5f9;
+        }
+
+        .chat-history-item.active:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Sidebar responsive behavior */
+        @media (max-width: 768px) {
+            .sidebar-backdrop {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+
+            .sidebar-backdrop.hidden {
+                display: none;
+            }
+
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        /* Loading dots animation */
+        .loading-dots {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #D60095;
+            border-radius: 50%;
+            animation: loadingPulse 1.4s ease-in-out infinite both;
+        }
+
+        .loading-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0s;
+        }
+
+        @keyframes loadingPulse {
+            0%, 80%, 100% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
@@ -845,41 +953,39 @@
         </div>
 
         <!-- Sidebar Content: Chat History -->
-        <div class="p-6 flex-1 flex flex-col">
+        <div class="p-6 flex-1 flex flex-col overflow-hidden">
             <!-- Chat History Section -->
-            <div class="mb-4">
-                <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+            <div class="mb-4 flex-1 flex flex-col overflow-hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center flex-shrink-0">
                     <i class="fas fa-history text-ltuc-primary mr-2"></i>
                     Chat History
                 </h3>
 
-                <!-- Empty State -->
-                <div id="chatHistoryContent" class="bg-gray-50 rounded-lg p-4 text-center">
-                    <div class="text-gray-400 mb-2">
-                        <i class="fas fa-comments text-2xl"></i>
+                <!-- Scrollable Chat History Container -->
+                <div class="flex-1 overflow-y-auto sidebar-scroll">
+                    <!-- Empty State -->
+                    <div id="chatHistoryContent" class="bg-gray-50 rounded-lg p-4 text-center">
+                        <div class="text-gray-400 mb-2">
+                            <i class="fas fa-comments text-2xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-1">No previous conversations</p>
+                        <p class="text-xs text-gray-400">Your chat history will appear here</p>
                     </div>
-                    <p class="text-sm text-gray-500 mb-1">No previous conversations</p>
-                    <p class="text-xs text-gray-400">Your chat history will appear here</p>
-                </div>
 
-                <!-- History will be populated here when available -->
-                <div id="historyList" class="space-y-2 hidden">
-                    <!-- Dynamic history items will be inserted here -->
+                    <!-- History will be populated here when available -->
+                    <div id="historyList" class="space-y-2 hidden">
+                        <!-- Dynamic history items will be inserted here -->
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Sidebar Footer -->
         <div class="p-6 border-t border-gray-100">
-            <div class="mb-3 text-xs text-gray-500 flex items-center">
+            <div class="text-xs text-gray-500 flex items-center">
                 <i class="fas fa-history mr-2"></i>
                 <span id="historyStatus">Conversation history active</span>
             </div>
-            <button id="clearBtn"
-                class="w-full flex items-center p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors">
-                <i class="fas fa-trash-alt mr-3"></i>
-                Clear Chat & History
-            </button>
         </div>
     </div>
 
@@ -1045,13 +1151,14 @@
         let toasterCount = 0;
         let isSending = false;
         const userName = @json($userName);
+        let currentChatId = null;
+        let chatHistory = [];
 
         // DOM Elements
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const chatMessages = document.getElementById('chatMessages');
         const newChatBtn = document.getElementById('newChatBtn');
-        const clearBtn = document.getElementById('clearBtn');
         const fileBtn = document.getElementById('fileBtn');
         const imageBtn = document.getElementById('imageBtn');
         const voiceBtn = document.getElementById('voiceBtn');
@@ -1099,13 +1206,13 @@
 
         // Sidebar controls (mobile)
         function openSidebarMobile() {
-            sidebar?.classList.remove('-translate-x-full');
+            sidebar?.classList.add('open');
             sidebarBackdrop?.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
 
         function closeSidebarMobile() {
-            sidebar?.classList.add('-translate-x-full');
+            sidebar?.classList.remove('open');
             sidebarBackdrop?.classList.add('hidden');
             document.body.style.overflow = '';
         }
@@ -1115,22 +1222,45 @@
         sidebarBackdrop?.addEventListener('click', closeSidebarMobile);
 
         // Show typing indicator
-        function showTyping() {
+        function showTyping(customMessage = null) {
+            // Remove existing typing indicator
+            hideTyping();
+
             const typingDiv = document.createElement('div');
             typingDiv.id = 'typing';
             typingDiv.className = 'flex items-start space-x-3 message-animation';
-            typingDiv.innerHTML = `
-                <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center flex-shrink-0">
-                    <img src="/assets/images/bot-icon.png" alt="Bot" class="bot-icon" />
-                </div>
-                <div class="bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm border border-gray-100">
-                    <div class="flex space-x-1">
-                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator"></div>
-                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator" style="animation-delay: 0.2s;"></div>
-                        <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator" style="animation-delay: 0.4s;"></div>
+
+            if (customMessage) {
+                typingDiv.innerHTML = `
+                    <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center flex-shrink-0">
+                        <img src="/assets/images/bot-icon.png" alt="Bot" class="bot-icon" />
                     </div>
-                </div>
-            `;
+                    <div class="bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm border border-gray-100">
+                        <div class="flex items-center space-x-2">
+                            <div class="flex space-x-1">
+                                <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator"></div>
+                                <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator" style="animation-delay: 0.2s;"></div>
+                                <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator" style="animation-delay: 0.4s;"></div>
+                            </div>
+                            <span class="text-sm text-gray-600 ml-2">${customMessage}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                typingDiv.innerHTML = `
+                    <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center flex-shrink-0">
+                        <img src="/assets/images/bot-icon.png" alt="Bot" class="bot-icon" />
+                    </div>
+                    <div class="bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm border border-gray-100">
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator" style="animation-delay: 0.2s;"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full typing-indicator" style="animation-delay: 0.4s;"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
             chatMessages.appendChild(typingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
@@ -1287,6 +1417,39 @@
 
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Add loading message function
+        function addLoadingMessage() {
+            const time = new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start space-x-3 message-animation loading-message';
+
+            messageDiv.innerHTML = `
+                <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center flex-shrink-0">
+                    <img src="/assets/images/bot-icon.png" alt="Bot" class="bot-icon" />
+                </div>
+                <div class="bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm max-w-2xl border border-gray-100 message-content">
+                    <div class="flex items-center space-x-2">
+                        <div class="loading-dots">
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                            <div class="loading-dot"></div>
+                        </div>
+                        <span class="text-gray-500 text-sm">Loading conversation...</span>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">${time}</div>
+                </div>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            return messageDiv;
         }
 
         // Image modal functions
@@ -1476,6 +1639,9 @@
             const formData = new FormData();
             formData.append('message', text);
             formData.append('user_name', userName);
+            if (currentChatId) {
+                formData.append('chat_id', currentChatId);
+            }
 
             // Add files to form data
             uploadedFiles.forEach((item, index) => {
@@ -1505,6 +1671,11 @@
                 hideTyping();
 
                 if (data.success) {
+                    // Update current chat info
+                    if (data.chat_id) {
+                        currentChatId = data.chat_id;
+                    }
+
                     // Use HTML content if available, otherwise fall back to plain text
                     let messageContent = data.message;
                     let isHtml = false;
@@ -1515,6 +1686,9 @@
                     }
 
                     addMessage(messageContent, false, [], isHtml);
+
+                    // Update chat history sidebar
+                    loadChatHistory();
                 } else {
                     // Handle specific error types
                     if (data.errors && data.errors['files.*']) {
@@ -1579,30 +1753,284 @@
                     setTimeout(() => msg.remove(), index * 50);
                 }
             });
+        }
 
-            // Clear conversation history on server
-            fetch('/api/chat/clear-history', {
-                    method: 'POST',
+        // Chat History Management Functions
+        async function loadChatHistory() {
+            try {
+                // Show loading indicator in sidebar
+                const historyList = document.getElementById('historyList');
+                const chatHistoryContent = document.getElementById('chatHistoryContent');
+
+                if (historyList && chatHistoryContent) {
+                    chatHistoryContent.classList.add('hidden');
+                    historyList.classList.remove('hidden');
+                    historyList.innerHTML = `
+                        <div class="flex items-center justify-center py-8">
+                            <div class="loading-dots mr-3">
+                                <div class="loading-dot"></div>
+                                <div class="loading-dot"></div>
+                                <div class="loading-dot"></div>
+                            </div>
+                            <span class="text-gray-500 text-sm">Loading chat history...</span>
+                        </div>
+                    `;
+                }
+
+                const response = await fetch('/api/chats');
+                const data = await response.json();
+
+                if (data.success) {
+                    chatHistory = data.chats;
+                    updateChatHistorySidebar();
+                }
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+                // Show error state
+                const historyList = document.getElementById('historyList');
+                if (historyList) {
+                    historyList.innerHTML = `
+                        <div class="text-center py-8 text-red-500">
+                            <i class="fas fa-exclamation-triangle text-2xl mb-3"></i>
+                            <p class="text-sm">Failed to load chat history</p>
+                            <button onclick="loadChatHistory()" class="text-xs text-blue-500 hover:underline mt-2">
+                                Try again
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function updateChatHistorySidebar() {
+            const historyList = document.getElementById('historyList');
+            const chatHistoryContent = document.getElementById('chatHistoryContent');
+            if (!historyList || !chatHistoryContent) return;
+
+            if (chatHistory.length === 0) {
+                // Show empty state, hide history list
+                chatHistoryContent.classList.remove('hidden');
+                historyList.classList.add('hidden');
+                chatHistoryContent.innerHTML = `
+                    <div class="bg-gray-50 rounded-lg p-4 text-center">
+                        <div class="text-gray-400 mb-2">
+                            <i class="fas fa-comments text-2xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-1">No previous conversations</p>
+                        <p class="text-xs text-gray-400">Your chat history will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Hide empty state, show history list
+            chatHistoryContent.classList.add('hidden');
+            historyList.classList.remove('hidden');
+
+            const historyHTML = chatHistory.map(chat => `
+                <div class="chat-history-item ${chat.id === currentChatId ? 'active' : ''}"
+                     data-chat-id="${chat.id}"
+                     onclick="loadChat(${chat.id})">
+                    <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-md cursor-pointer group transition-colors">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-medium text-gray-900 truncate text-sm">${chat.title || 'New Chat'}</h4>
+                            <p class="text-xs text-gray-400 mt-1">${formatChatDate(chat.last_message_at)}</p>
+                        </div>
+                        <button class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 ml-2 p-1"
+                                onclick="event.stopPropagation(); deleteChat(${chat.id})"
+                                title="Delete chat">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            historyList.innerHTML = historyHTML;
+        }
+
+        async function loadChat(chatId) {
+            try {
+                // Add loading state to sidebar item
+                const chatItem = document.querySelector(`[data-chat-id="${chatId}"]`);
+                if (chatItem) {
+                    chatItem.classList.add('loading');
+                    const originalContent = chatItem.innerHTML;
+                    chatItem.style.opacity = '0.6';
+                }
+
+                // Show loading indicator in chat area
+                showTyping("Loading chat messages...");
+
+                // Clear current messages (except welcome message)
+                const messages = chatMessages.querySelectorAll('.message-animation');
+                messages.forEach((msg, index) => {
+                    if (index > 0) {
+                        msg.remove();
+                    }
+                });
+
+                // Load messages for selected chat
+                const response = await fetch(`/api/chats/${chatId}/messages`);
+
+                // Hide loading indicator
+                hideTyping();
+
+                // Remove loading state from sidebar
+                if (chatItem) {
+                    chatItem.classList.remove('loading');
+                    chatItem.style.opacity = '1';
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentChatId = chatId;
+                    const chat = data.chat;
+
+                    // Add messages to chat with proper formatting
+                    chat.messages.forEach(message => {
+                        const isUser = message.role === 'user';
+
+                        if (isUser) {
+                            // User messages use plain content
+                            addMessage(message.content, true, message.attachments || [], false);
+                        } else {
+                            // AI messages: use HTML content if available, otherwise fall back to content
+                            const messageContent = message.html_content || message.content;
+                            const isHtml = !!message.html_content;
+                            addMessage(messageContent, false, message.attachments || [], isHtml);
+                        }
+                    });
+
+                    // Update sidebar selection
+                    updateChatHistorySidebar();
+
+                    // Close sidebar on mobile
+                    closeSidebarMobile();
+                } else {
+                    throw new Error(data.message || 'Failed to load chat messages');
+                }
+            } catch (error) {
+                console.error('Error loading chat:', error);
+
+                // Hide loading indicator on error
+                hideTyping();
+
+                showToaster('Error', `Failed to load chat: ${error.message}`, 'error');
+
+                // Remove loading state on error
+                const chatItem = document.querySelector(`[data-chat-id="${chatId}"]`);
+                if (chatItem) {
+                    chatItem.classList.remove('loading');
+                    chatItem.style.opacity = '1';
+                }
+            }
+        }
+
+        function createNewChat() {
+            try {
+                // Simply clear the current chat and reset state
+                clearChat();
+                currentChatId = null; // Reset to null so next message creates new chat
+                loadChatHistory(); // Refresh sidebar
+            } catch (error) {
+                console.error('Error creating new chat:', error);
+                showToaster('Error', 'Failed to create new chat', 'error');
+            }
+        }
+
+        async function deleteChat(chatId) {
+            if (!confirm('Are you sure you want to delete this conversation?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/chats/${chatId}`, {
+                    method: 'DELETE',
                     headers: {
-                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     }
-                }).then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log('Conversation history cleared successfully');
-                        // Update history status
-                        const historyStatus = document.getElementById('historyStatus');
-                        if (historyStatus) {
-                            historyStatus.textContent = 'New conversation started';
-                            setTimeout(() => {
-                                historyStatus.textContent = 'Conversation history active';
-                            }, 3000);
-                        }
-                    }
-                }).catch(error => {
-                    console.error('Error clearing conversation history:', error);
                 });
+
+                const data = await response.json();
+                if (data.success) {
+                    // If deleting current chat, start a new one
+                    if (chatId === currentChatId) {
+                        createNewChat();
+                    } else {
+                        loadChatHistory();
+                    }
+                    showToaster('Chat deleted successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Error deleting chat:', error);
+                showToaster('Error', 'Failed to delete chat', 'error');
+            }
+        }
+
+        function formatChatDate(dateString) {
+            if (!dateString) return '';
+
+            const date = new Date(dateString);
+            const now = new Date();
+
+            // Check if date is valid
+            if (isNaN(date.getTime())) {
+                return 'Invalid date';
+            }
+
+            const diffMs = now - date;
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            // For very recent messages
+            if (diffMinutes < 1) {
+                return 'Just now';
+            } else if (diffMinutes < 60) {
+                return `${diffMinutes}m ago`;
+            }
+            // For today's messages, show time
+            else if (diffHours < 24 && date.toDateString() === now.toDateString()) {
+                return date.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+            // For yesterday's messages
+            else if (diffDays === 1) {
+                return 'Yesterday ' + date.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+            // For this week's messages
+            else if (diffDays < 7) {
+                const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                return dayNames[date.getDay()] + ' ' + date.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
+            // For older messages, show full date and time
+            else {
+                return date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+                }) + ' ' + date.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            }
         }
 
         // Event Listeners
@@ -1622,11 +2050,9 @@
         });
 
         newChatBtn.addEventListener('click', () => {
-            clearChat();
+            createNewChat();
             clearAllFiles();
         });
-
-        clearBtn.addEventListener('click', clearChat);
 
         fileBtn.addEventListener('click', () => {
             handleFileUpload(
@@ -1750,6 +2176,22 @@
                 closeImageModal();
             }
         });
+
+        // Initialize app
+        function initializeChatApp() {
+            // Load chat history on page load
+            loadChatHistory();
+
+            // Focus on message input
+            messageInput.focus();
+        }
+
+        // Start the app when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeChatApp);
+        } else {
+            initializeChatApp();
+        }
     </script>
 </body>
 

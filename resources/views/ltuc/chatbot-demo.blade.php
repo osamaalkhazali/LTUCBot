@@ -44,7 +44,7 @@
         .bot-icon {
             width: 24px;
             height: 24px;
-            object-fit: contain;
+            /* object-fit: contain; */
             /* filter: brightness(0) invert(1); Makes the icon white */
         }
 
@@ -716,6 +716,28 @@
                 overflow-x: hidden;
             }
 
+            /* Ensure header is visible on mobile */
+            .bg-black.text-white.border-b {
+                padding: 1rem !important;
+                min-height: 4rem !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            /* Make hamburger button more visible */
+            #openSidebar {
+                width: 2.5rem !important;
+                height: 2.5rem !important;
+                margin-right: 0.75rem !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            #openSidebar i {
+                font-size: 1.125rem !important;
+                color: white !important;
+            }
+
             /* Message containers on mobile */
             .message-content {
                 max-width: calc(100vw - 100px);
@@ -820,6 +842,167 @@
 
             .code-block pre {
                 font-size: 12px;
+            }
+        }
+
+        /* Mobile sidebar responsive behavior */
+        @media (max-width: 768px) {
+            /* Mobile body layout fix */
+            body {
+                flex-direction: column !important;
+                height: 100vh !important;
+                overflow: hidden !important;
+            }
+
+            /* Ensure sidebar is properly positioned */
+            #sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100vh !important;
+                width: 20rem !important;
+                z-index: 50 !important;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            /* Fix sidebar header layout on mobile */
+            #sidebar .p-6.border-b.border-gray-100.bg-black {
+                padding: 1.5rem !important;
+                display: flex !important;
+                flex-direction: column !important;
+                background-color: #000000 !important;
+            }
+
+            /* Ensure logo container is on its own line */
+            #sidebar .flex.items-center.mb-4 {
+                display: flex !important;
+                align-items: center !important;
+                margin-bottom: 1rem !important;
+                width: 100% !important;
+            }
+
+            /* Ensure logo is visible and properly sized */
+            #sidebar .flex.items-center.mb-4 img {
+                height: 1rem !important;
+                width: auto !important;
+                max-width: 80% !important;
+                display: block !important;
+                object-fit: contain !important;
+            }
+
+            /* Ensure New Chat button is on separate line */
+            #newChatBtn {
+                display: block !important;
+                width: 100% !important;
+                padding: 0.75rem 1rem !important;
+                margin-top: 0 !important;
+                background-color: #D60095 !important;
+                color: white !important;
+                border-radius: 0.75rem !important;
+                font-weight: 500 !important;
+                text-align: center !important;
+            }
+
+            .sidebar-backdrop {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+
+            .sidebar-backdrop.hidden {
+                display: none;
+            }
+
+            /* Ensure main chat area takes full space and header is visible */
+            .flex-1.flex.flex-col.min-w-0 {
+                width: 100% !important;
+                height: 100vh !important;
+                position: relative !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+
+            /* Force header visibility and proper styling */
+            .bg-black.text-white.border-b {
+                position: relative !important;
+                z-index: 10 !important;
+                flex-shrink: 0 !important;
+                width: 100% !important;
+                background-color: #000000 !important;
+                color: white !important;
+                display: flex !important;
+                padding: 1rem !important;
+                min-height: 4rem !important;
+            }
+
+            /* Ensure header content is visible */
+            .bg-black .flex.items-center.justify-between {
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+            }
+
+            .bg-black .flex.items-center {
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            /* Force hamburger button visibility */
+            #openSidebar {
+                display: flex !important;
+                width: 2.5rem !important;
+                height: 2.5rem !important;
+                margin-right: 0.75rem !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                border-radius: 0.5rem !important;
+                align-items: center !important;
+                justify-content: center !important;
+                color: white !important;
+            }
+
+            #openSidebar i {
+                font-size: 1.125rem !important;
+                color: white !important;
+                display: block !important;
+            }
+
+            /* Force logo visibility */
+            .bg-black img {
+                height: 1.4rem !important;
+                width: auto !important;
+                display: block !important;
+            }
+
+            /* Force title visibility */
+            .bg-black h2 {
+                font-size: 1.125rem !important;
+                font-weight: bold !important;
+                color: white !important;
+                display: block !important;
+                margin: 0 !important;
+            }
+
+            .bg-black p {
+                font-size: 0.75rem !important;
+                color: #d1d5db !important;
+                display: block !important;
+                margin: 0 !important;
+            }
+
+            /* Fix chat messages area */
+            #chatMessages {
+                flex: 1 !important;
+                overflow-y: auto !important;
+                height: calc(100vh - 120px) !important; /* Account for header and input */
             }
         }
     </style>
@@ -1152,13 +1335,13 @@
 
         // Sidebar controls (mobile)
         function openSidebarMobile() {
-            sidebar?.classList.remove('-translate-x-full');
+            sidebar?.classList.add('open');
             sidebarBackdrop?.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
 
         function closeSidebarMobile() {
-            sidebar?.classList.add('-translate-x-full');
+            sidebar?.classList.remove('open');
             sidebarBackdrop?.classList.add('hidden');
             document.body.style.overflow = '';
         }

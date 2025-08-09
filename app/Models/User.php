@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -44,5 +45,29 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the chats for the user.
+     */
+    public function chats(): HasMany
+    {
+        return $this->hasMany(Chat::class)->orderBy('last_message_at', 'desc');
+    }
+
+    /**
+     * Get the messages for the user.
+     */
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get the active chat for the user.
+     */
+    public function activeChat()
+    {
+        return $this->chats()->where('is_active', true)->first();
     }
 }

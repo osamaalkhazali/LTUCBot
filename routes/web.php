@@ -23,6 +23,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/chat', [ChatbotController::class, 'chat'])->middleware('throttle:20,1')->name('api.chat');
     Route::post('/api/chat/clear-history', [ChatbotController::class, 'clearHistory'])->name('api.chat.clear-history');
     Route::get('/api/chat/history', [ChatbotController::class, 'getHistory'])->name('api.chat.history');
+
+    // New Chat Management Routes
+    Route::get('/api/chats', [ChatbotController::class, 'getChatsHistory'])->name('api.chats.list');
+    Route::get('/api/chats/{chatId}/messages', [ChatbotController::class, 'getChatMessages'])->name('api.chats.messages');
+    Route::post('/api/chats/new', [ChatbotController::class, 'createNewChat'])->name('api.chats.create');
+    Route::delete('/api/chats/{chatId}', [ChatbotController::class, 'deleteChat'])->name('api.chats.delete');
 });
 
 // Public LTUC AI Chatbot (Demo Version - No Authentication Required)

@@ -7,6 +7,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\Chat;
+use App\Models\Message;
 use OpenAI;
 
 class ChatbotController extends Controller
@@ -259,7 +261,8 @@ class ChatbotController extends Controller
                 'files'     => 'nullable|array|max:5',
                 'files.*'   => 'file|max:10240', // 10MB
                 'clear_history' => 'nullable|boolean',
-                'user_name' => 'nullable|string|max:255'
+                'user_name' => 'nullable|string|max:255',
+                'chat_id' => 'nullable|integer|exists:chats,id'
             ];
 
             if ($hasFiles && !$hasMessage) {
@@ -272,19 +275,32 @@ class ChatbotController extends Controller
 
             $request->validate($validationRules);
 
-            // Handle conversation history
+            $user = Auth::user();
+            $userMessage = $request->string('message')->toString();
+            $userName = $request->string('user_name')->toString() ?: $user->name;
+
+            // Handle conversation history - get or create chat
+            $chatId = $request->integer('chat_id');
             $clearHistory = $request->boolean('clear_history', false);
-            if ($clearHistory) {
-                session()->forget('chat_history');
+
+            if ($clearHistory || !$chatId) {
+                // Create new chat
+                $chat = Chat::create([
+                    'user_id' => $user->id,
+                    'title' => null, // Will be generated from first message
+                    'is_active' => true,
+                    'last_message_at' => now(),
+                ]);
+            } else {
+                // Get existing chat and verify ownership
+                $chat = Chat::where('id', $chatId)
+                    ->where('user_id', $user->id)
+                    ->firstOrFail();
+                $chat->touchLastMessage();
             }
 
-            // Get existing conversation history
-            $conversationHistory = session()->get('chat_history', []);
-
-            $userMessage = $request->string('message')->toString();
-
-            // Get user name for personalization
-            $userName = $request->string('user_name')->toString() ?: 'Student';
+            // Get conversation history from database
+            $conversationHistory = $this->getChatHistory($chat);
 
             // Generate intelligent analysis prompt for file-only uploads
             if (!$hasMessage && $hasFiles) {
@@ -385,10 +401,8 @@ Always provide detailed, educational explanations and encourage learning through
 
             $reply = $response->choices[0]->message->content ?? 'Sorry, I could not generate a response.';
 
-            // Save conversation to history
-            $this->saveToConversationHistory($currentUserMessage, $reply);
-
-            // Parse markdown and return both raw and HTML
+            // Parse markdown for AI response
+            $htmlReply = null;
             try {
                 $htmlReply = $this->parseMarkdown($reply);
             } catch (\Throwable $markdownError) {
@@ -396,11 +410,21 @@ Always provide detailed, educational explanations and encourage learning through
                 $htmlReply = null; // Frontend will fall back to plain text
             }
 
+            // Save conversation to database (with both raw and HTML content)
+            $this->saveChatMessages($chat, $currentUserMessage, $reply, $htmlReply, $request->hasFile('files') ? $request->file('files') : []);
+
+            // Generate title for new chat if needed
+            if (!$chat->title) {
+                $chat->update(['title' => $chat->generateTitle()]);
+            }
+
             return response()->json([
                 'success'   => true,
                 'message'   => $reply,
                 'html'      => $htmlReply,
                 'timestamp' => now()->format('H:i'),
+                'chat_id'   => $chat->id,
+                'chat_title' => $chat->title,
             ]);
         } catch (\Illuminate\Validation\ValidationException $ve) {
             Log::error('Validation Error: ' . json_encode($ve->errors()));
@@ -1773,54 +1797,32 @@ Always provide detailed, educational explanations and encourage learning through
     }
 
     /**
-     * Save user message and AI response to conversation history
-     */
-    private function saveToConversationHistory(array $userMessage, string $aiResponse): void
-    {
-        $conversationHistory = session()->get('chat_history', []);
-
-        // Add user message
-        $conversationHistory[] = $userMessage;
-
-        // Add AI response
-        $conversationHistory[] = [
-            'role' => 'assistant',
-            'content' => $aiResponse
-        ];
-
-        // Keep only the last 40 messages (20 exchanges) to manage memory and token usage
-        if (count($conversationHistory) > 40) {
-            $conversationHistory = array_slice($conversationHistory, -40);
-        }
-
-        session()->put('chat_history', $conversationHistory);
-    }
-
-    /**
-     * Clear conversation history
+     * Clear conversation history (now creates a new chat)
      */
     public function clearHistory(Request $request): JsonResponse
     {
-        session()->forget('chat_history');
+        $user = Auth::user();
+
+        $chat = Chat::create([
+            'user_id' => $user->id,
+            'title' => 'New Chat',
+            'is_active' => true,
+            'last_message_at' => now(),
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Conversation history cleared successfully.'
+            'message' => 'New conversation started.',
+            'chat_id' => $chat->id
         ]);
     }
 
     /**
-     * Get conversation history
+     * Get conversation history for current user
      */
     public function getHistory(Request $request): JsonResponse
     {
-        $conversationHistory = session()->get('chat_history', []);
-
-        return response()->json([
-            'success' => true,
-            'history' => $conversationHistory,
-            'count' => count($conversationHistory)
-        ]);
+        return $this->getChatsHistory($request);
     }
 
     /**
@@ -2023,5 +2025,169 @@ Always provide detailed, educational explanations and encourage learning through
         } else {
             return "Analyze these {$totalFiles} files: {$fileList}. If any contain questions or problems, solve them. Otherwise, summarize what you found and ask what I need help with.";
         }
+    }
+
+    /**
+     * Get chat history from database for conversation context
+     */
+    private function getChatHistory(Chat $chat, int $limit = 20): array
+    {
+        $messages = $chat->messages()
+            ->orderBy('created_at', 'asc')
+            ->take($limit)
+            ->get();
+
+        $history = [];
+        foreach ($messages as $message) {
+            $history[] = [
+                'role' => $message->role,
+                'content' => $message->content
+            ];
+        }
+
+        return $history;
+    }
+
+    /**
+     * Save chat messages to database
+     */
+    private function saveChatMessages(Chat $chat, array $userMessage, string $aiResponse, ?string $aiResponseHtml, array $files = []): void
+    {
+        // Prepare attachments data
+        $attachments = [];
+        foreach ($files as $file) {
+            $attachments[] = [
+                'name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'type' => $file->getMimeType(),
+                'extension' => $file->getClientOriginalExtension()
+            ];
+        }
+
+        // Save user message
+        Message::create([
+            'chat_id' => $chat->id,
+            'user_id' => $chat->user_id,
+            'role' => 'user',
+            'content' => $userMessage['content'],
+            'html_content' => null, // User messages don't need HTML processing
+            'attachments' => empty($attachments) ? null : $attachments,
+        ]);
+
+        // Save AI response
+        Message::create([
+            'chat_id' => $chat->id,
+            'user_id' => $chat->user_id,
+            'role' => 'assistant',
+            'content' => $aiResponse,
+            'html_content' => $aiResponseHtml,
+        ]);
+    }
+
+    /**
+     * Get chat history for API endpoint
+     */
+    public function getChatsHistory(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        $chats = $user->chats()
+            ->with(['messages' => function ($query) {
+                $query->orderBy('created_at', 'desc')->limit(1);
+            }])
+            ->orderBy('last_message_at', 'desc')
+            ->limit(50)
+            ->get();
+
+        $chatList = $chats->map(function ($chat) {
+            $lastMessage = $chat->messages->first();
+            return [
+                'id' => $chat->id,
+                'title' => $chat->title ?: 'New Chat',
+                'last_message_at' => $chat->last_message_at?->format('Y-m-d H:i:s'),
+                'last_message_preview' => $lastMessage ? $lastMessage->getPreview(50) : '',
+                'message_count' => $chat->messages->count()
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'chats' => $chatList
+        ]);
+    }
+
+    /**
+     * Get messages for a specific chat
+     */
+    public function getChatMessages(Request $request, int $chatId): JsonResponse
+    {
+        $user = Auth::user();
+
+        $chat = Chat::where('id', $chatId)
+            ->where('user_id', $user->id)
+            ->with(['messages' => function ($query) {
+                $query->orderBy('created_at', 'asc');
+            }])
+            ->firstOrFail();
+
+        $messages = $chat->messages->map(function ($message) {
+            return [
+                'id' => $message->id,
+                'role' => $message->role,
+                'content' => $message->content,
+                'html_content' => $message->html_content,
+                'attachments' => $message->attachments,
+                'created_at' => $message->created_at->format('H:i'),
+                'timestamp' => $message->created_at->toISOString()
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'chat' => [
+                'id' => $chat->id,
+                'title' => $chat->title,
+                'messages' => $messages
+            ]
+        ]);
+    }
+
+    /**
+     * Create a new chat session
+     */
+    public function createNewChat(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+
+        $chat = Chat::create([
+            'user_id' => $user->id,
+            'title' => 'New Chat',
+            'is_active' => true,
+            'last_message_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'chat_id' => $chat->id,
+            'message' => 'New chat created successfully.'
+        ]);
+    }
+
+    /**
+     * Delete a chat and all its messages
+     */
+    public function deleteChat(Request $request, int $chatId): JsonResponse
+    {
+        $user = Auth::user();
+
+        $chat = Chat::where('id', $chatId)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        $chat->delete(); // This will cascade delete messages due to foreign key constraint
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Chat deleted successfully.'
+        ]);
     }
 }
