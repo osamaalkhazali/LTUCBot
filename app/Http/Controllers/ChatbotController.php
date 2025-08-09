@@ -478,7 +478,10 @@ Always provide detailed, educational explanations and encourage learning through
      */
     private function isImageFile(string $ext): bool
     {
-        return in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff', 'tif']);
+        return in_array($ext, [
+            'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff', 'tif',
+            'heic', 'heif', 'avif', 'jfif', 'pjpeg', 'pjp', 'apng', 'raw', 'cr2', 'nef', 'arw', 'dng'
+        ]);
     }
 
     /**

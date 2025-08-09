@@ -1189,9 +1189,23 @@
         }
 
         // Send message
+        let isSending = false; // Track if a message is currently being sent
+        
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text && uploadedFiles.length === 0) return;
+            
+            // Prevent duplicate sending
+            if (isSending) return;
+            isSending = true;
+            
+            // Disable send button and input
+            sendBtn.disabled = true;
+            messageInput.disabled = true;
+            
+            // Update send button to show loading state
+            const originalContent = sendBtn.innerHTML;
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
             // Prepare attachments for preview
             const attachments = [];
@@ -1301,6 +1315,19 @@
                     6000
                 );
                 console.error('Network Error:', error);
+            } finally {
+                // Restore button state regardless of success or error
+                isSending = false;
+                sendBtn.innerHTML = originalContent;
+                messageInput.disabled = false;
+                
+                // Re-enable send button based on current input state
+                const hasText = messageInput.value.trim();
+                const hasFiles = uploadedFiles.length > 0;
+                sendBtn.disabled = !hasText && !hasFiles;
+                
+                // Focus back to input
+                messageInput.focus();
             }
         }
 
@@ -1327,7 +1354,9 @@
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                sendMessage();
+                if (!isSending) { // Only send if not already sending
+                    sendMessage();
+                }
             }
         });
 
@@ -1353,7 +1382,7 @@
         });
 
         imageBtn.addEventListener('click', () => {
-            handleFileUpload('.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.tiff,.ico', 'image');
+            handleFileUpload('.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.tiff,.ico,.heic,.heif,.avif,.jfif,.pjpeg,.pjp,.apng,.raw,.cr2,.nef,.arw,.dng', 'image');
         });
 
         voiceBtn.addEventListener('click', () => {
