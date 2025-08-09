@@ -254,7 +254,8 @@ class ChatbotController extends Controller
             // Validation with conditional message requirement
             $validationRules = [
                 'files'     => 'nullable|array|max:5',
-                'files.*'   => 'file|max:10240' // 10MB
+                'files.*'   => 'file|max:10240', // 10MB
+                'clear_history' => 'nullable|boolean'
             ];
 
             if ($hasFiles && !$hasMessage) {
@@ -267,6 +268,15 @@ class ChatbotController extends Controller
 
             $request->validate($validationRules);
 
+            // Handle conversation history
+            $clearHistory = $request->boolean('clear_history', false);
+            if ($clearHistory) {
+                session()->forget('chat_history');
+            }
+
+            // Get existing conversation history
+            $conversationHistory = session()->get('chat_history', []);
+
             $userMessage = $request->string('message')->toString();
 
             // Generate intelligent analysis prompt for file-only uploads
@@ -274,6 +284,7 @@ class ChatbotController extends Controller
                 $userMessage = $this->generateFileAnalysisPrompt($request->file('files'));
             }
 
+            // Build messages array starting with system message
             $messages = [
                 [
                     'role'    => 'system',
@@ -329,21 +340,33 @@ Use markdown formatting to make your responses clear and well-structured:
 - Provide complete, runnable code examples when possible
 - Include comments in code to explain complex parts
 
+🧠 **CONVERSATION CONTEXT:**
+You have access to the full conversation history. Reference previous messages, files, and analyses when relevant to provide coherent, contextual responses. If a user asks about something from earlier in the conversation, refer back to it appropriately.
+
 Always provide detailed, educational explanations and encourage learning through practical examples.'
-                ],
-                [
-                    'role'    => 'user',
-                    'content' => $userMessage,
                 ]
             ];
 
-            // Handle files
+            // Add previous conversation history (limit to last 20 messages to avoid token limits)
+            $recentHistory = array_slice($conversationHistory, -20);
+            $messages = array_merge($messages, $recentHistory);
+
+            // Prepare current user message
+            $currentUserMessage = [
+                'role'    => 'user',
+                'content' => $userMessage,
+            ];
+
+            // Handle files for current message
             if ($request->hasFile('files')) {
                 $attachmentsText = $this->buildAttachmentsContext($request->file('files'));
                 if ($attachmentsText !== '') {
-                    $messages[1]['content'] .= "\n\n---\nAttached files:\n" . $attachmentsText;
+                    $currentUserMessage['content'] .= "\n\n---\nAttached files:\n" . $attachmentsText;
                 }
             }
+
+            // Add current message to conversation
+            $messages[] = $currentUserMessage;
 
             // Call OpenAI
             $response = $this->client->chat()->create([
@@ -354,6 +377,9 @@ Always provide detailed, educational explanations and encourage learning through
             ]);
 
             $reply = $response->choices[0]->message->content ?? 'Sorry, I could not generate a response.';
+
+            // Save conversation to history
+            $this->saveToConversationHistory($currentUserMessage, $reply);
 
             // Parse markdown and return both raw and HTML
             try {
@@ -1737,6 +1763,57 @@ Always provide detailed, educational explanations and encourage learning through
         }, $paragraphs);
 
         return implode("\n", array_filter($paragraphs));
+    }
+
+    /**
+     * Save user message and AI response to conversation history
+     */
+    private function saveToConversationHistory(array $userMessage, string $aiResponse): void
+    {
+        $conversationHistory = session()->get('chat_history', []);
+
+        // Add user message
+        $conversationHistory[] = $userMessage;
+
+        // Add AI response
+        $conversationHistory[] = [
+            'role' => 'assistant',
+            'content' => $aiResponse
+        ];
+
+        // Keep only the last 40 messages (20 exchanges) to manage memory and token usage
+        if (count($conversationHistory) > 40) {
+            $conversationHistory = array_slice($conversationHistory, -40);
+        }
+
+        session()->put('chat_history', $conversationHistory);
+    }
+
+    /**
+     * Clear conversation history
+     */
+    public function clearHistory(Request $request): JsonResponse
+    {
+        session()->forget('chat_history');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Conversation history cleared successfully.'
+        ]);
+    }
+
+    /**
+     * Get conversation history
+     */
+    public function getHistory(Request $request): JsonResponse
+    {
+        $conversationHistory = session()->get('chat_history', []);
+
+        return response()->json([
+            'success' => true,
+            'history' => $conversationHistory,
+            'count' => count($conversationHistory)
+        ]);
     }
 
     /**

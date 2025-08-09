@@ -731,10 +731,14 @@
 
         <!-- Sidebar Footer -->
         <div class="p-6 border-t border-gray-100">
+            <div class="mb-3 text-xs text-gray-500 flex items-center">
+                <i class="fas fa-history mr-2"></i>
+                <span id="historyStatus">Conversation history active</span>
+            </div>
             <button id="clearBtn"
                 class="w-full flex items-center p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors">
                 <i class="fas fa-trash-alt mr-3"></i>
-                Clear Chat
+                Clear Chat & History
             </button>
         </div>
     </div>
@@ -1436,6 +1440,30 @@
                     setTimeout(() => msg.remove(), index * 50);
                 }
             });
+
+            // Clear conversation history on server
+            fetch('/api/chat/clear-history', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      console.log('Conversation history cleared successfully');
+                      // Update history status
+                      const historyStatus = document.getElementById('historyStatus');
+                      if (historyStatus) {
+                          historyStatus.textContent = 'New conversation started';
+                          setTimeout(() => {
+                              historyStatus.textContent = 'Conversation history active';
+                          }, 3000);
+                      }
+                  }
+              }).catch(error => {
+                  console.error('Error clearing conversation history:', error);
+              });
         }
 
         // Event Listeners

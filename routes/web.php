@@ -21,5 +21,7 @@ Route::middleware('auth')->group(function () {
 // LTUC AI Chatbot
 Route::get('/ltuc/chatbot', [ChatbotController::class, 'index'])->name('ltuc.chatbot');
 Route::post('/api/chat', [ChatbotController::class, 'chat'])->middleware('throttle:20,1')->name('api.chat');
+Route::post('/api/chat/clear-history', [ChatbotController::class, 'clearHistory'])->name('api.chat.clear-history');
+Route::get('/api/chat/history', [ChatbotController::class, 'getHistory'])->name('api.chat.history');
 
 require __DIR__ . '/auth.php';
