@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>LTUC AI Assistant</title>
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('assets/images/fav.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -125,13 +127,15 @@
 
         /* Style for variables */
         .math-var {
-            color: #D60095; /* LTUC primary color */
+            color: #D60095;
+            /* LTUC primary color */
             font-style: italic;
         }
 
         /* Style for operators */
         .math-op {
-            color: #2E8570; /* LTUC secondary color */
+            color: #2E8570;
+            /* LTUC secondary color */
             font-weight: 500;
         }
 
@@ -1443,27 +1447,27 @@
 
             // Clear conversation history on server
             fetch('/api/chat/clear-history', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            }).then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      console.log('Conversation history cleared successfully');
-                      // Update history status
-                      const historyStatus = document.getElementById('historyStatus');
-                      if (historyStatus) {
-                          historyStatus.textContent = 'New conversation started';
-                          setTimeout(() => {
-                              historyStatus.textContent = 'Conversation history active';
-                          }, 3000);
-                      }
-                  }
-              }).catch(error => {
-                  console.error('Error clearing conversation history:', error);
-              });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Conversation history cleared successfully');
+                        // Update history status
+                        const historyStatus = document.getElementById('historyStatus');
+                        if (historyStatus) {
+                            historyStatus.textContent = 'New conversation started';
+                            setTimeout(() => {
+                                historyStatus.textContent = 'Conversation history active';
+                            }, 3000);
+                        }
+                    }
+                }).catch(error => {
+                    console.error('Error clearing conversation history:', error);
+                });
         }
 
         // Event Listeners
@@ -1500,7 +1504,9 @@
         });
 
         imageBtn.addEventListener('click', () => {
-            handleFileUpload('.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.tiff,.ico,.heic,.heif,.avif,.jfif,.pjpeg,.pjp,.apng,.raw,.cr2,.nef,.arw,.dng', 'image');
+            handleFileUpload(
+                '.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.tiff,.ico,.heic,.heif,.avif,.jfif,.pjpeg,.pjp,.apng,.raw,.cr2,.nef,.arw,.dng',
+                'image');
         });
 
         voiceBtn.addEventListener('click', () => {
@@ -1537,9 +1543,9 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     ${[1,2,3,4,5,6].map(i => (
                         `<div class=\"border border-gray-100 rounded-lg p-3 bg-white flex flex-col items-center justify-center h-28\">
-                                                                        <i class=\"fas fa-image ${i % 2 ? 'text-[#2E8570]' : 'text-[#D60095]'}\"></i>
-                                                                        <span class=\"text-xs text-gray-500 mt-2\">Image ${i}</span>
-                                                                    </div>`
+                                                                                <i class=\"fas fa-image ${i % 2 ? 'text-[#2E8570]' : 'text-[#D60095]'}\"></i>
+                                                                                <span class=\"text-xs text-gray-500 mt-2\">Image ${i}</span>
+                                                                            </div>`
                     )).join('')}
                 </div>`;
             openModal('Generated Images', grid);
