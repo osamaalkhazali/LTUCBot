@@ -97,6 +97,96 @@
             max-width: 200px;
         }
 
+        /* Math expression styles */
+        .math-block {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 12px 16px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: 'Cambria Math', 'STIX Two Math', serif;
+        }
+
+        .math-inline {
+            font-family: 'Cambria Math', 'STIX Two Math', serif;
+            padding: 2px 4px;
+            background-color: #f9fafb;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        .math-content {
+            font-size: 1.05rem;
+            line-height: 1.5;
+            color: #1f2937;
+        }
+
+        /* Style for variables */
+        .math-var {
+            color: #D60095; /* LTUC primary color */
+            font-style: italic;
+        }
+
+        /* Style for operators */
+        .math-op {
+            color: #2E8570; /* LTUC secondary color */
+            font-weight: 500;
+        }
+
+        /* Style for mathematical symbols */
+        .math-symbol {
+            color: #2E8570;
+            font-weight: 500;
+        }
+
+        /* Style for fractions */
+        .math-frac {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            margin: 0 3px;
+        }
+
+        .math-frac-num {
+            display: block;
+            padding: 0 3px;
+            border-bottom: 1px solid #2E8570;
+        }
+
+        .math-frac-den {
+            display: block;
+            padding: 0 3px;
+        }
+
+        /* Style for square roots */
+        .math-sqrt {
+            position: relative;
+            display: inline-block;
+        }
+
+        .math-sqrt-content {
+            padding: 0 2px 0 0;
+            border-top: 1px solid #2E8570;
+            margin-left: 2px;
+        }
+
+        /* Style for subscripts and superscripts */
+        .math-sub {
+            font-size: 0.75em;
+            position: relative;
+            bottom: -0.4em;
+            color: #D60095;
+        }
+
+        .math-sup {
+            font-size: 0.75em;
+            position: relative;
+            top: -0.5em;
+            color: #D60095;
+        }
+
         .file-chip button {
             margin-left: 6px;
             color: #ef4444;

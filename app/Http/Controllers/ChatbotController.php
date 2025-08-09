@@ -240,14 +240,39 @@ class ChatbotController extends Controller
                 ], 422);
             }
 
-            // Validation: message + optional files
-            $request->validate([
-                'message'   => 'required|string|max:50000',
+            // Conditional validation: require either message or files
+            $hasFiles = $request->hasFile('files') && !empty($request->file('files'));
+            $hasMessage = !empty($request->input('message'));
+
+            if (!$hasMessage && !$hasFiles) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please provide either a message or upload files.',
+                ], 422);
+            }
+
+            // Validation with conditional message requirement
+            $validationRules = [
                 'files'     => 'nullable|array|max:5',
                 'files.*'   => 'file|max:10240' // 10MB
-            ]);
+            ];
+
+            if ($hasFiles && !$hasMessage) {
+                // Files only - message is optional
+                $validationRules['message'] = 'nullable|string|max:50000';
+            } else {
+                // Message required when no files or when both are present
+                $validationRules['message'] = 'required|string|max:50000';
+            }
+
+            $request->validate($validationRules);
 
             $userMessage = $request->string('message')->toString();
+
+            // Generate intelligent analysis prompt for file-only uploads
+            if (!$hasMessage && $hasFiles) {
+                $userMessage = $this->generateFileAnalysisPrompt($request->file('files'));
+            }
 
             $messages = [
                 [
@@ -1569,9 +1594,39 @@ Always provide detailed, educational explanations and encourage learning through
      */
     private function parseMarkdown(string $text): string
     {
-        // Step 1: Handle code blocks FIRST before any other processing
+        // Step 1: Handle code blocks and math expressions FIRST before any other processing
         $codeBlocks = [];
         $codeBlockCounter = 0;
+        $mathBlocks = [];
+        $mathBlockCounter = 0;
+
+        // Extract math block expressions and replace with placeholders
+        $text = preg_replace_callback('/\\\\\\[(.*?)\\\\\\]/s', function ($matches) use (&$mathBlocks, &$mathBlockCounter) {
+            $mathContent = trim($matches[1]);
+            $placeholder = "___MATHBLOCK_{$mathBlockCounter}___";
+
+            $mathBlocks[$placeholder] = [
+                'content' => $mathContent,
+                'type' => 'block'
+            ];
+
+            $mathBlockCounter++;
+            return $placeholder;
+        }, $text);
+
+        // Extract inline math expressions and replace with placeholders
+        $text = preg_replace_callback('/\\\\\\((.*?)\\\\\\)/s', function ($matches) use (&$mathBlocks, &$mathBlockCounter) {
+            $mathContent = trim($matches[1]);
+            $placeholder = "___MATHBLOCK_{$mathBlockCounter}___";
+
+            $mathBlocks[$placeholder] = [
+                'content' => $mathContent,
+                'type' => 'inline'
+            ];
+
+            $mathBlockCounter++;
+            return $placeholder;
+        }, $text);
 
         // Extract code blocks and replace with placeholders
         $text = preg_replace_callback('/```([a-zA-Z0-9+#-]*)\s*(.*?)\s*```/s', function ($matches) use (&$codeBlocks, &$codeBlockCounter) {
@@ -1632,7 +1687,22 @@ Always provide detailed, educational explanations and encourage learning through
             return $matches[0];
         }, $text);
 
-        // Step 4: Restore code blocks with proper HTML
+        // Step 4: Format math expressions
+        foreach ($mathBlocks as $placeholder => $block) {
+            $mathContent = $this->formatMathExpression($block['content']);
+
+            if ($block['type'] === 'block') {
+                $mathHtml = '<div class="math-block">
+                    <div class="math-content">' . $mathContent . '</div>
+                </div>';
+            } else {
+                $mathHtml = '<span class="math-inline">' . $mathContent . '</span>';
+            }
+
+            $text = str_replace($placeholder, $mathHtml, $text);
+        }
+
+        // Step 5: Restore code blocks with proper HTML
         foreach ($codeBlocks as $placeholder => $block) {
             $codeHtml = htmlspecialchars($block['code'], ENT_QUOTES, 'UTF-8');
             $langClass = $block['language'] ? ' data-language="' . $block['language'] . '"' : '';
@@ -1652,7 +1722,7 @@ Always provide detailed, educational explanations and encourage learning through
             $text = str_replace($placeholder, $codeBlockHtml, $text);
         }
 
-        // Step 5: Convert line breaks to paragraphs
+        // Step 6: Convert line breaks to paragraphs
         $paragraphs = explode("\n\n", $text);
         $paragraphs = array_map(function ($p) {
             $p = trim($p);
@@ -1667,5 +1737,210 @@ Always provide detailed, educational explanations and encourage learning through
         }, $paragraphs);
 
         return implode("\n", array_filter($paragraphs));
+    }
+
+    /**
+     * Format a mathematical expression with proper styling
+     */
+    private function formatMathExpression(string $expression): string
+    {
+        // Convert newlines to <br> tags
+        $expression = str_replace("\n", "<br>", $expression);
+
+        // Process LaTeX commands first
+
+        // Process fractions (\frac{}{})
+        $expression = preg_replace_callback('/\\\\frac\{(.*?)\}\{(.*?)\}/', function ($matches) {
+            $numerator = $this->formatMathSubExpression($matches[1]);
+            $denominator = $this->formatMathSubExpression($matches[2]);
+            return '<span class="math-frac"><span class="math-frac-num">' . $numerator . '</span><span class="math-frac-line"></span><span class="math-frac-den">' . $denominator . '</span></span>';
+        }, $expression);
+
+        // Process multiplication (\times)
+        $expression = str_replace('\\times', '<span class="math-op">×</span>', $expression);
+
+        // Process division (\div)
+        $expression = str_replace('\\div', '<span class="math-op">÷</span>', $expression);
+
+        // Process other common LaTeX commands
+        $latexCommands = [
+            // Greek letters
+            '\\alpha' => 'α',
+            '\\beta' => 'β',
+            '\\gamma' => 'γ',
+            '\\delta' => 'δ',
+            '\\epsilon' => 'ε',
+            '\\zeta' => 'ζ',
+            '\\eta' => 'η',
+            '\\theta' => 'θ',
+            '\\iota' => 'ι',
+            '\\kappa' => 'κ',
+            '\\lambda' => 'λ',
+            '\\mu' => 'μ',
+            '\\nu' => 'ν',
+            '\\xi' => 'ξ',
+            '\\pi' => 'π',
+            '\\rho' => 'ρ',
+            '\\sigma' => 'σ',
+            '\\tau' => 'τ',
+            '\\upsilon' => 'υ',
+            '\\phi' => 'φ',
+            '\\chi' => 'χ',
+            '\\psi' => 'ψ',
+            '\\omega' => 'ω',
+            '\\Alpha' => 'Α',
+            '\\Beta' => 'Β',
+            '\\Gamma' => 'Γ',
+            '\\Delta' => 'Δ',
+            '\\Epsilon' => 'Ε',
+            '\\Zeta' => 'Ζ',
+            '\\Eta' => 'Η',
+            '\\Theta' => 'Θ',
+            '\\Iota' => 'Ι',
+            '\\Kappa' => 'Κ',
+            '\\Lambda' => 'Λ',
+            '\\Mu' => 'Μ',
+            '\\Nu' => 'Ν',
+            '\\Xi' => 'Ξ',
+            '\\Pi' => 'Π',
+            '\\Rho' => 'Ρ',
+            '\\Sigma' => 'Σ',
+            '\\Tau' => 'Τ',
+            '\\Upsilon' => 'Υ',
+            '\\Phi' => 'Φ',
+            '\\Chi' => 'Χ',
+            '\\Psi' => 'Ψ',
+            '\\Omega' => 'Ω',
+
+            // Operations
+            '\\pm' => '±',
+            '\\mp' => '∓',
+            '\\cdot' => '·',
+            '\\neq' => '≠',
+            '\\approx' => '≈',
+            '\\equiv' => '≡',
+            '\\leq' => '≤',
+            '\\geq' => '≥',
+
+            // Sets and logic
+            '\\emptyset' => '∅',
+            '\\in' => '∈',
+            '\\notin' => '∉',
+            '\\subset' => '⊂',
+            '\\supset' => '⊃',
+            '\\cup' => '∪',
+            '\\cap' => '∩',
+            '\\forall' => '∀',
+            '\\exists' => '∃',
+            '\\nexists' => '∄',
+            '\\neg' => '¬',
+            '\\land' => '∧',
+            '\\lor' => '∨',
+
+            // Calculus and misc
+            '\\nabla' => '∇',
+            '\\partial' => '∂',
+            '\\infty' => '∞',
+            '\\sum' => '∑',
+            '\\prod' => '∏',
+            '\\int' => '∫',
+            '\\oint' => '∮',
+        ];
+
+        foreach ($latexCommands as $command => $symbol) {
+            $expression = str_replace($command, '<span class="math-symbol">' . $symbol . '</span>', $expression);
+        }
+
+        // Process subscripts and superscripts
+        // Subscripts with braces
+        $expression = preg_replace_callback('/_{(.*?)}/', function ($matches) {
+            return '<sub class="math-sub">' . $this->formatMathSubExpression($matches[1]) . '</sub>';
+        }, $expression);
+
+        // Superscripts with braces
+        $expression = preg_replace_callback('/\^{(.*?)}/', function ($matches) {
+            return '<sup class="math-sup">' . $this->formatMathSubExpression($matches[1]) . '</sup>';
+        }, $expression);
+
+        // Single character subscripts without braces
+        $expression = preg_replace('/_([a-zA-Z0-9])/', '<sub class="math-sub">$1</sub>', $expression);
+
+        // Single character superscripts without braces
+        $expression = preg_replace('/\^([a-zA-Z0-9])/', '<sup class="math-sup">$1</sup>', $expression);
+
+        // Process square roots
+        $expression = preg_replace_callback('/\\\\sqrt\{(.*?)\}/', function ($matches) {
+            $content = $this->formatMathSubExpression($matches[1]);
+            return '<span class="math-sqrt">√<span class="math-sqrt-content">' . $content . '</span></span>';
+        }, $expression);
+
+        // Format variables (single letters) with special styling
+        // But don't format if they are part of a LaTeX command
+        $expression = preg_replace('/(?<!\\\\)\b([a-zA-Z])\b(?!\{)/', '<span class="math-var">$1</span>', $expression);
+
+        // Format common mathematical operators with special styling
+        $operators = [
+            '+' => '<span class="math-op">+</span>',
+            '-' => '<span class="math-op">-</span>',
+            '*' => '<span class="math-op">*</span>',
+            '/' => '<span class="math-op">/</span>',
+            '=' => '<span class="math-op">=</span>',
+            '<' => '<span class="math-op">&lt;</span>',
+            '>' => '<span class="math-op">&gt;</span>',
+        ];
+
+        foreach ($operators as $op => $replacement) {
+            // Use spacing to avoid replacing within variables or other text
+            $expression = str_replace(' ' . $op . ' ', ' ' . $replacement . ' ', $expression);
+
+            // Also handle operators at the beginning or end of the expression
+            $expression = preg_replace('/^\\' . $op . ' /', $replacement . ' ', $expression);
+            $expression = preg_replace('/ \\' . $op . '$/', ' ' . $replacement, $expression);
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Format a sub-expression within a larger math expression
+     * This prevents double-formatting of nested elements
+     */
+    private function formatMathSubExpression(string $expression): string
+    {
+        // Simple formatting for sub-expressions to avoid over-processing
+        // Format variables
+        $expression = preg_replace('/(?<!\\\\)\b([a-zA-Z])\b(?!\{)/', '<span class="math-var">$1</span>', $expression);
+
+        return $expression;
+    }
+
+    /**
+     * Generate simple and direct analysis prompt for file-only uploads
+     */
+    private function generateFileAnalysisPrompt(array $files): string
+    {
+        $totalFiles = count($files);
+        $fileNames = array_map(fn($file) => $file->getClientOriginalName(), $files);
+        $fileList = implode(', ', array_map(fn($name) => "`{$name}`", $fileNames));
+
+        if ($totalFiles === 1) {
+            $file = $files[0];
+            $extension = strtolower($file->getClientOriginalExtension());
+
+            // Simple, direct prompts based on file type
+            if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'heic', 'heif', 'avif', 'tiff'])) {
+                return "Analyze this image. If it contains any questions or problems, solve them. Otherwise, describe what you see and ask me what I need help with.";
+            } elseif (in_array($extension, ['pdf', 'doc', 'docx', 'txt', 'rtf'])) {
+                return "Read and analyze this document. If it contains questions or exercises, solve them. Otherwise, summarize the content and ask what specific help I need.";
+            } elseif (in_array($extension, ['php', 'js', 'html', 'css', 'py', 'java', 'cpp', 'c', 'cs', 'rb', 'go', 'rs', 'swift', 'kt', 'ts', 'jsx', 'vue', 'sql', 'json', 'xml', 'yaml', 'yml'])) {
+                return "Review this code. Explain what it does and identify any issues or improvements. Ask me what specific help I need with it.";
+            } elseif (in_array($extension, ['xls', 'xlsx', 'csv'])) {
+                return "Analyze this spreadsheet data. Summarize the key information and ask what I need help with.";
+            } else {
+                return "Analyze this file and tell me what it contains. Ask me what specific help I need with it.";
+            }
+        } else {
+            return "Analyze these {$totalFiles} files: {$fileList}. If any contain questions or problems, solve them. Otherwise, summarize what you found and ask what I need help with.";
+        }
     }
 }
