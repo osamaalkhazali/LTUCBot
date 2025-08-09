@@ -15,13 +15,19 @@ class ForceHttpsMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Force HTTPS on production environments (Railway, Render, etc.)
-        if (!$request->secure() && 
-            (config('app.env') === 'production' || 
-             isset($_ENV['RAILWAY_ENVIRONMENT']) || 
-             isset($_ENV['RENDER']) ||
-             str_contains($request->getHost(), 'railway.app') ||
-             str_contains($request->getHost(), 'onrender.com'))) {
+        // Don't redirect if we're already on HTTPS or behind a proxy that provides HTTPS
+        if ($request->secure() || 
+            $request->header('X-Forwarded-Proto') === 'https' ||
+            $request->header('X-Forwarded-Ssl') === 'on') {
+            return $next($request);
+        }
+
+        // Only redirect to HTTPS on production environments
+        if (config('app.env') === 'production' || 
+            isset($_ENV['RAILWAY_ENVIRONMENT']) || 
+            isset($_ENV['RENDER']) ||
+            str_contains($request->getHost(), 'railway.app') ||
+            str_contains($request->getHost(), 'onrender.com')) {
             
             return redirect()->secure($request->getRequestUri(), 301);
         }

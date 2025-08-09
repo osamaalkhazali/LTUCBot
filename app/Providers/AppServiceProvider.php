@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Http\Request;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,12 +24,15 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        // Force HTTPS in production or on Railway/Render
+        // Configure trusted proxies and force HTTPS for production
         if (config('app.env') === 'production' || 
             isset($_ENV['RAILWAY_ENVIRONMENT']) || 
-            isset($_ENV['RENDER']) ||
-            str_contains(config('app.url'), 'railway.app') ||
-            str_contains(config('app.url'), 'onrender.com')) {
+            isset($_ENV['RENDER'])) {
+            
+            // Trust all proxies for Railway/Render
+            $this->app['request']->setTrustedProxies(['*'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
+            
+            // Force HTTPS scheme
             URL::forceScheme('https');
         }
     }
