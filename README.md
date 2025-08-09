@@ -158,6 +158,69 @@ php artisan serve
 npm run dev
 ```
 
+## 🐳 Docker Deployment
+
+### Docker Setup for Render
+
+The project includes Docker configuration optimized for Render deployment:
+
+#### Dockerfile
+```dockerfile
+# استخدم صورة PHP 8.2 مع CLI
+FROM php:8.2-cli
+
+# تثبيت الإضافات المطلوبة لـ Laravel + MySQL
+RUN apt-get update && apt-get install -y \
+    unzip \
+    libpq-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-install pdo pdo_mysql zip gd
+
+# تثبيت Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# نسخ ملفات المشروع
+WORKDIR /var/www
+COPY . .
+
+# تثبيت مكتبات Laravel
+RUN composer install --no-dev --optimize-autoloader
+
+# فتح المنفذ وتشغيل Laravel
+EXPOSE 10000
+CMD php artisan serve --host=0.0.0.0 --port=10000
+```
+
+#### .dockerignore
+```
+vendor
+node_modules
+.env
+```
+
+### Local Docker Commands
+
+```bash
+# Build Docker image
+docker build -t ltuc-ai-assistant .
+
+# Run container
+docker run -p 10000:10000 --env-file .env ltuc-ai-assistant
+
+# Access application
+http://localhost:10000
+```
+
+### Render Deployment
+
+1. **Push to GitHub**: Ensure Dockerfile and .dockerignore are committed
+2. **Create Render Service**: Connect your GitHub repository
+3. **Set Environment Variables**: Configure OpenAI API key and database
+4. **Deploy**: Render will automatically build and deploy using Docker
+
 ## ⚙️ Configuration
 
 ### Environment Variables
