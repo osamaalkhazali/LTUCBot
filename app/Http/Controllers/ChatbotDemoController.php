@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use OpenAI;
 
-class ChatbotController extends Controller
+class ChatbotDemoController extends Controller
 {
     /** @var \OpenAI\Client */
     private $client;
@@ -215,7 +215,7 @@ class ChatbotController extends Controller
 
     public function index()
     {
-        return view('ltuc.chatbot');
+        return view('ltuc.chatbot-demo');
     }
 
     public function chat(Request $request): JsonResponse

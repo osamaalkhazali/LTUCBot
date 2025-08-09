@@ -580,7 +580,8 @@
         }
 
         /* General text content styling */
-        p, .ai-response p {
+        p,
+        .ai-response p {
             word-wrap: break-word;
             overflow-wrap: break-word;
             word-break: break-word;
@@ -709,6 +710,7 @@
 
         /* Responsive adjustments */
         @media (max-width: 640px) {
+
             /* Overall mobile layout */
             body {
                 overflow-x: hidden;
@@ -741,7 +743,7 @@
             }
 
             /* Avatar sizing */
-            .message-animation > div:first-child {
+            .message-animation>div:first-child {
                 width: 2rem;
                 height: 2rem;
                 flex-shrink: 0;
@@ -764,13 +766,15 @@
 
             /* Textarea on mobile */
             #messageInput {
-                font-size: 16px; /* Prevents zoom on iOS */
+                font-size: 16px;
+                /* Prevents zoom on iOS */
                 min-height: 40px;
             }
 
             /* Action buttons row */
-            .flex.items-center.justify-between > div:last-child {
-                display: none; /* Hide the hint text on mobile */
+            .flex.items-center.justify-between>div:last-child {
+                display: none;
+                /* Hide the hint text on mobile */
             }
 
             /* Action buttons spacing */
@@ -844,34 +848,79 @@
             </button>
         </div>
 
-        <!-- Sidebar Content: Tabs Only -->
-        <div class="p-6 flex-1 flex flex-col">
-            <!-- Tabs (stacked) -->
-            <div class="mb-4 space-y-2">
-                <button id="tabImages"
-                    class="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
-                    <span class="text-sm font-medium text-gray-700">Generated Images</span>
-                    <i class="fas fa-chevron-right text-gray-400"></i>
-                </button>
-                <button id="tabFavorites"
-                    class="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
-                    <span class="text-sm font-medium text-gray-700">Study Tools</span>
-                    <i class="fas fa-chevron-right text-gray-400"></i>
-                </button>
+        <!-- Sidebar Content: Demo Information -->
+        <div class="p-6 flex-1 flex flex-col overflow-y-auto">
+            <!-- About LTUC AI Assistant -->
+            <div class="mb-4">
+                <h3 class="text-base font-semibold text-gray-800 mb-2 flex items-center">
+                    <i class="fas fa-robot text-ltuc-primary mr-2"></i>
+                    LTUC AI Assistant
+                </h3>
+                <div class="text-sm text-gray-600 mb-3">
+                    <p class="mb-2">AI-powered learning companion for students and educators.</p>
+                    <div class="bg-gray-50 p-2 rounded text-xs">
+                        <div class="grid grid-cols-2 gap-1">
+                            <div>• 📚 Homework help</div>
+                            <div>• 🖼️ Image analysis</div>
+                            <div>• 📄 Document processing</div>
+                            <div>• 💬 24/7 support</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo Notice -->
+            <div class="mb-4">
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-3 rounded">
+                    <div class="flex items-center text-sm text-blue-700 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span class="font-medium">Demo Limitations</span>
+                    </div>
+                    <div class="space-y-1 text-xs text-blue-600">
+                        <div>• Only 10 messages per chat</div>
+                        <div>• No chat history saved</div>
+                        <div>• File uploads limited to 2MB</div>
+                        <div>• No personalized features</div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-blue-200">
+                        <p class="text-xs text-blue-700 font-medium">
+                            🚀 Sign up for unlimited conversations & full features!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-auto space-y-2">
+                <a href="{{ route('login') }}"
+                    class="w-full flex items-center justify-center px-4 py-2 bg-white border-2 border-gray-300 text-gray-700 rounded-lg font-medium text-sm hover:bg-gray-50 hover:border-gray-400 transition duration-300">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Log in
+                </a>
+
+                <a href="{{ route('register') }}"
+                    class="w-full flex items-center justify-center px-4 py-2 ltuc-primary text-white rounded-lg font-medium text-sm hover:opacity-90 transition duration-300">
+                    <i class="fas fa-rocket mr-2"></i>
+                    Start Now
+                </a>
             </div>
         </div>
 
         <!-- Sidebar Footer -->
-        <div class="p-6 border-t border-gray-100">
-            <div class="mb-3 text-xs text-gray-500 flex items-center">
-                <i class="fas fa-history mr-2"></i>
-                <span id="historyStatus">Conversation history active</span>
+        <div class="p-4 border-t border-gray-100 bg-gray-50">
+            <div class="text-center">
+                <div class="flex items-center justify-center text-xs text-gray-500 space-x-4">
+                    <span class="flex items-center">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        Secure
+                    </span>
+                    <span class="flex items-center">
+                        <i class="fas fa-clock mr-1"></i>
+                        24/7
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">© 2025 LTUC</p>
             </div>
-            <button id="clearBtn"
-                class="w-full flex items-center p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors">
-                <i class="fas fa-trash-alt mr-3"></i>
-                Clear Chat & History
-            </button>
         </div>
     </div>
 
@@ -912,10 +961,7 @@
                         <p class="text-gray-300 text-xs">Ready to help with your questions</p>
                     </div>
                 </div>
-                <div class="flex items-center bg-green-100 px-2 py-1 rounded-full">
-                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>
-                    <span class="text-xs text-green-700 font-medium">Active</span>
-                </div>
+
             </div>
         </div>
 
@@ -926,7 +972,8 @@
                 <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center flex-shrink-0">
                     <img src="{{ asset('assets/images/bot-icon.png') }}" alt="Bot" class="bot-icon" />
                 </div>
-                <div class="bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm max-w-2xl border border-gray-100 message-content">
+                <div
+                    class="bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm max-w-2xl border border-gray-100 message-content">
                     <p class="text-gray-800 leading-relaxed">
                         Welcome to LTUC Learning Assistant! 🎓 I'm here to help you with information about our programs,
                         courses, and academic support.
@@ -980,7 +1027,8 @@
                                 style="line-height: 1.4;" rows="1"></textarea>
 
                             <!-- Character Count -->
-                            <div id="charCount" class="absolute -bottom-5 right-2 text-xs text-gray-400 hidden z-10 bg-white bg-opacity-90 px-1 rounded">
+                            <div id="charCount"
+                                class="absolute -bottom-5 right-2 text-xs text-gray-400 hidden z-10 bg-white bg-opacity-90 px-1 rounded">
                                 0 characters
                             </div>
                         </div>
@@ -996,12 +1044,12 @@
                     <!-- Action Buttons Row (moved to bottom) with hint on the right -->
                     <div class="flex items-center justify-between">
                         <div class="flex gap-1">
-                            <button id="fileBtn" title="Attach File (Max 10MB)"
+                            <button id="fileBtn" title="Attach File (Max 2MB - Demo)"
                                 class="w-9 h-9 bg-white hover:bg-[#D60095]/10 border border-gray-200 hover:border-[#D60095]/40 rounded-xl flex items-center justify-center transition-all group">
                                 <i class="fas fa-paperclip text-gray-500 group-hover:text-[#D60095] text-sm"></i>
                             </button>
 
-                            <button id="imageBtn" title="Attach Image (Max 10MB)"
+                            <button id="imageBtn" title="Attach Image (Max 2MB - Demo)"
                                 class="w-9 h-9 bg-white hover:bg-[#2E8570]/10 border border-gray-200 hover:border-[#2E8570]/40 rounded-xl flex items-center justify-center transition-all group">
                                 <i class="fas fa-image text-gray-500 group-hover:text-[#2E8570] text-sm"></i>
                             </button>
@@ -1014,7 +1062,7 @@
 
                         <div class="flex items-center text-xs text-gray-500">
                             <i class="fas fa-info-circle mr-1"></i>
-                            Max 10MB per file • Press Enter to send
+                            Max 2MB per file (Demo) • Press Enter to send
                         </div>
                     </div>
                 </div>
@@ -1038,6 +1086,8 @@
         // Global variables
         let uploadedFiles = [];
         let toasterCount = 0;
+        let messageCount = 0; // Demo message counter
+        const MAX_DEMO_MESSAGES = 10;
 
         // DOM Elements
         const messageInput = document.getElementById('messageInput');
@@ -1070,18 +1120,34 @@
             messageInput.style.height = 'auto';
             messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
 
+            // Check demo message limit
+            if (messageCount >= MAX_DEMO_MESSAGES) {
+                sendBtn.disabled = true;
+                messageInput.disabled = true;
+                messageInput.placeholder = 'Demo limit reached - Sign up for unlimited messages!';
+                charCount.textContent = `Demo limit: ${messageCount}/${MAX_DEMO_MESSAGES} messages used`;
+                charCount.style.color = '#ef4444';
+                charCount.classList.remove('hidden');
+                return;
+            }
+
             // Update send button state
             const hasText = messageInput.value.trim().length > 0;
             const hasFiles = uploadedFiles.length > 0;
             sendBtn.disabled = !hasText && !hasFiles;
 
-            // Update character count
+            // Update character count and demo counter
             const length = messageInput.value.length;
-            charCount.textContent = `${length} characters`;
-            charCount.classList.toggle('hidden', length === 0);
+            const remainingMessages = MAX_DEMO_MESSAGES - messageCount;
+            charCount.textContent = `${length} characters • ${remainingMessages} messages left in demo`;
+            charCount.classList.toggle('hidden', length === 0 && remainingMessages === MAX_DEMO_MESSAGES);
 
-            // Update color based on length (optional visual feedback)
-            if (length > 2000) {
+            // Update color based on length and remaining messages
+            if (remainingMessages <= 2) {
+                charCount.style.color = '#ef4444';
+            } else if (remainingMessages <= 5) {
+                charCount.style.color = '#f59e0b';
+            } else if (length > 2000) {
                 charCount.style.color = '#ef4444';
             } else if (length > 1500) {
                 charCount.style.color = '#f59e0b';
@@ -1316,7 +1382,7 @@
             input.multiple = true;
             input.onchange = (e) => {
                 const files = Array.from(e.target.files);
-                const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+                const maxSize = 2 * 1024 * 1024; // 2MB in bytes (Demo limitation)
                 const validFiles = [];
                 const invalidFiles = [];
 
@@ -1332,7 +1398,7 @@
                 if (invalidFiles.length > 0) {
                     const fileNames = invalidFiles.map(f => f.name).join(', ');
                     showFileError(
-                        `❌ File(s) too large: ${fileNames}\n\nMaximum file size is 10MB. Please compress or resize your files and try again.`
+                        `❌ File(s) too large: ${fileNames}\n\nDemo limitation: Maximum file size is 2MB. Sign up for 10MB uploads!`
                     );
                 }
 
@@ -1419,12 +1485,23 @@
         let isSending = false; // Track if a message is currently being sent
 
         async function sendMessage() {
+            // Check demo message limit
+            if (messageCount >= MAX_DEMO_MESSAGES) {
+                showToaster(
+                    'Demo limit reached! You\'ve used all 10 messages. Please sign up for unlimited conversations.',
+                    'warning');
+                return;
+            }
+
             const text = messageInput.value.trim();
             if (!text && uploadedFiles.length === 0) return;
 
             // Prevent duplicate sending
             if (isSending) return;
             isSending = true;
+
+            // Increment message counter for demo
+            messageCount++;
 
             // Disable send button and input
             sendBtn.disabled = true;
@@ -1559,6 +1636,13 @@
         }
 
         function clearChat() {
+            // Reset demo message counter
+            messageCount = 0;
+
+            // Re-enable input and reset placeholder
+            messageInput.disabled = false;
+            messageInput.placeholder = 'Type your message here...';
+
             const messages = chatMessages.querySelectorAll('.message-animation');
             messages.forEach((msg, index) => {
                 if (index > 0) { // Keep welcome message
@@ -1573,6 +1657,9 @@
                     setTimeout(() => msg.remove(), index * 50);
                 }
             });
+
+            // Update the character count display
+            autoResize();
 
             // Clear conversation history on server
             fetch('/api/chat/clear-history', {
@@ -1600,9 +1687,9 @@
         }
 
         // Event Listeners
-        sendBtn.addEventListener('click', sendMessage);
+        sendBtn?.addEventListener('click', sendMessage);
 
-        messageInput.addEventListener('keypress', (e) => {
+        messageInput?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 if (!isSending) { // Only send if not already sending
@@ -1611,30 +1698,30 @@
             }
         });
 
-        messageInput.addEventListener('input', (e) => {
+        messageInput?.addEventListener('input', (e) => {
             autoResize();
         });
 
-        newChatBtn.addEventListener('click', () => {
+        newChatBtn?.addEventListener('click', () => {
             clearChat();
             clearAllFiles();
         });
 
-        clearBtn.addEventListener('click', clearChat);
+        clearBtn?.addEventListener('click', clearChat);
 
-        fileBtn.addEventListener('click', () => {
+        fileBtn?.addEventListener('click', () => {
             handleFileUpload(
                 '.pdf,.doc,.docx,.txt,.xlsx,.pptx,.json,.xml,.yaml,.yml,.js,.jsx,.ts,.tsx,.php,.py,.java,.cpp,.c,.cs,.rb,.go,.rs,.swift,.html,.css,.sql,.md,.csv,.zip,.rar',
                 'file');
         });
 
-        imageBtn.addEventListener('click', () => {
+        imageBtn?.addEventListener('click', () => {
             handleFileUpload(
                 '.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.tiff,.ico,.heic,.heif,.avif,.jfif,.pjpeg,.pjp,.apng,.raw,.cr2,.nef,.arw,.dng',
                 'image');
         });
 
-        voiceBtn.addEventListener('click', () => {
+        voiceBtn?.addEventListener('click', () => {
             // Voice message simulation
             messageInput.value = "🎤 Voice message recorded (Demo feature)";
             autoResize();
@@ -1668,9 +1755,9 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     ${[1,2,3,4,5,6].map(i => (
                         `<div class=\"border border-gray-100 rounded-lg p-3 bg-white flex flex-col items-center justify-center h-28\">
-                                                                                <i class=\"fas fa-image ${i % 2 ? 'text-[#2E8570]' : 'text-[#D60095]'}\"></i>
-                                                                                <span class=\"text-xs text-gray-500 mt-2\">Image ${i}</span>
-                                                                            </div>`
+                                                                                                        <i class=\"fas fa-image ${i % 2 ? 'text-[#2E8570]' : 'text-[#D60095]'}\"></i>
+                                                                                                        <span class=\"text-xs text-gray-500 mt-2\">Image ${i}</span>
+                                                                                                    </div>`
                     )).join('')}
                 </div>`;
             openModal('Generated Images', grid);
@@ -1753,6 +1840,7 @@
 
         // Initialize
         messageInput.focus();
+        autoResize(); // Initialize the counter display
 
         // Image modal event listeners
         const imageModal = document.getElementById('imageModal');

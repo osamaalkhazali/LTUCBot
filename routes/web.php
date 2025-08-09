@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ChatbotDemoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,6 +21,7 @@ Route::middleware('auth')->group(function () {
 
 // LTUC AI Chatbot
 Route::get('/ltuc/chatbot', [ChatbotController::class, 'index'])->name('ltuc.chatbot');
+Route::get('/ltuc/chatbot-demo', [ChatbotDemoController::class, 'index'])->name('ltuc.chatbot.demo');
 Route::post('/api/chat', [ChatbotController::class, 'chat'])->middleware('throttle:20,1')->name('api.chat');
 Route::post('/api/chat/clear-history', [ChatbotController::class, 'clearHistory'])->name('api.chat.clear-history');
 Route::get('/api/chat/history', [ChatbotController::class, 'getHistory'])->name('api.chat.history');

@@ -200,7 +200,7 @@
                             <span>Create Account</span>
                             <i class="fas fa-user-plus"></i>
                         </a>
-                        <a href="/ltuc/chatbot"
+                        <a href="/ltuc/chatbot-demo"
                             class="group px-8 py-4 ltuc-secondary text-white rounded-xl font-semibold text-lg hover:opacity-90 transform hover:scale-105 transition duration-300 flex items-center space-x-3">
                             <span>Try Demo Again</span>
                             <i class="fas fa-redo group-hover:rotate-180 transition duration-300"></i>
