@@ -1026,7 +1026,7 @@
                         <p class="text-gray-300 text-xs">Ready to help with your questions</p>
                     </div>
                 </div>
-                
+
             </div>
         </div>
 
@@ -1113,11 +1113,6 @@
                                 class="w-9 h-9 bg-white hover:bg-[#2E8570]/10 border border-gray-200 hover:border-[#2E8570]/40 rounded-xl flex items-center justify-center transition-all group">
                                 <i class="fas fa-image text-gray-500 group-hover:text-[#2E8570] text-sm"></i>
                             </button>
-
-                            <button id="voiceBtn" title="Voice Message"
-                                class="w-9 h-9 bg-white hover:bg-[#A84A9D]/10 border border-gray-200 hover:border-[#A84A9D]/40 rounded-xl flex items-center justify-center transition-all group">
-                                <i class="fas fa-microphone text-gray-500 group-hover:text-[#A84A9D] text-sm"></i>
-                            </button>
                         </div>
 
                         <div class="flex items-center text-xs text-gray-500">
@@ -1158,7 +1153,6 @@
         const newChatBtn = document.getElementById('newChatBtn');
         const fileBtn = document.getElementById('fileBtn');
         const imageBtn = document.getElementById('imageBtn');
-        const voiceBtn = document.getElementById('voiceBtn');
         const filePreviewRow = document.getElementById('filePreviewRow');
         const fileChips = document.getElementById('fileChips');
         const charCount = document.getElementById('charCount');
@@ -2061,13 +2055,6 @@
             handleFileUpload(
                 '.jpg,.jpeg,.png,.gif,.bmp,.webp,.svg,.tiff,.ico,.heic,.heif,.avif,.jfif,.pjpeg,.pjp,.apng,.raw,.cr2,.nef,.arw,.dng',
                 'image');
-        });
-
-        voiceBtn.addEventListener('click', () => {
-            // Voice message simulation
-            messageInput.value = "🎤 Voice message recorded (Demo feature)";
-            autoResize();
-            messageInput.focus();
         });
 
         // Make removeFile globally accessible
