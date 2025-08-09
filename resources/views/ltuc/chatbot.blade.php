@@ -1190,19 +1190,19 @@
 
         // Send message
         let isSending = false; // Track if a message is currently being sent
-        
+
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text && uploadedFiles.length === 0) return;
-            
+
             // Prevent duplicate sending
             if (isSending) return;
             isSending = true;
-            
+
             // Disable send button and input
             sendBtn.disabled = true;
             messageInput.disabled = true;
-            
+
             // Update send button to show loading state
             const originalContent = sendBtn.innerHTML;
             sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -1320,12 +1320,12 @@
                 isSending = false;
                 sendBtn.innerHTML = originalContent;
                 messageInput.disabled = false;
-                
+
                 // Re-enable send button based on current input state
                 const hasText = messageInput.value.trim();
                 const hasFiles = uploadedFiles.length > 0;
                 sendBtn.disabled = !hasText && !hasFiles;
-                
+
                 // Focus back to input
                 messageInput.focus();
             }

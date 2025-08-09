@@ -479,8 +479,28 @@ Always provide detailed, educational explanations and encourage learning through
     private function isImageFile(string $ext): bool
     {
         return in_array($ext, [
-            'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico', 'tiff', 'tif',
-            'heic', 'heif', 'avif', 'jfif', 'pjpeg', 'pjp', 'apng', 'raw', 'cr2', 'nef', 'arw', 'dng'
+            'jpg',
+            'jpeg',
+            'png',
+            'gif',
+            'bmp',
+            'webp',
+            'svg',
+            'ico',
+            'tiff',
+            'tif',
+            'heic',
+            'heif',
+            'avif',
+            'jfif',
+            'pjpeg',
+            'pjp',
+            'apng',
+            'raw',
+            'cr2',
+            'nef',
+            'arw',
+            'dng'
         ]);
     }
 
@@ -623,17 +643,25 @@ Always provide detailed, educational explanations and encourage learning through
                 return 'Unable to read image file.';
             }
 
-            // Validate image using getimagesize
+            // Get file extension for format checking
+            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+            // Validate image using getimagesize (skip for HEIC/HEIF as they may not be supported)
             $imageInfo = @getimagesize($path);
-            if ($imageInfo === false) {
+            if ($imageInfo === false && !in_array($ext, ['heic', 'heif', 'avif'])) {
                 Log::error("Invalid image format or corrupted image: {$path}");
                 return '❌ **Invalid Image**\n\nThe uploaded file appears to be corrupted or is not a valid image format.';
             }
 
-            // Use the detected MIME type if it differs from provided
-            $actualMimeType = $imageInfo['mime'];
-            if ($actualMimeType !== $mimeType) {
+            // Use the detected MIME type if available, otherwise use provided MIME type
+            $actualMimeType = $imageInfo['mime'] ?? $mimeType;
+            if ($actualMimeType !== $mimeType && $imageInfo !== false) {
                 $mimeType = $actualMimeType;
+            }
+
+            // For HEIC/HEIF files, set proper MIME type if not detected
+            if (in_array($ext, ['heic', 'heif']) && !str_contains($mimeType, 'heic') && !str_contains($mimeType, 'heif')) {
+                $mimeType = $ext === 'heic' ? 'image/heic' : 'image/heif';
             }
 
             // Check image size constraints
@@ -661,8 +689,17 @@ Always provide detailed, educational explanations and encourage learning through
             // Validate the data URL format
             $dataUrl = "data:{$mimeType};base64,{$base64Data}";
 
+            // For HEIC/HEIF, try to convert MIME type to something OpenAI might understand better
+            $apiMimeType = $mimeType;
+            if (str_contains($mimeType, 'heic') || str_contains($mimeType, 'heif')) {
+                // OpenAI might handle these better as JPEG equivalent
+                $apiMimeType = 'image/jpeg';
+            }
+
+            $apiDataUrl = "data:{$apiMimeType};base64,{$base64Data}";
+
             $response = $this->client->chat()->create([
-                'model' => 'gpt-4o-mini', // Try the full gpt-4o model for better vision capabilities
+                'model' => 'gpt-4o', // Use full gpt-4o model for better vision capabilities
                 'messages' => [
                     [
                         'role' => 'user',
@@ -674,14 +711,14 @@ Always provide detailed, educational explanations and encourage learning through
                             [
                                 'type' => 'image_url',
                                 'image_url' => [
-                                    'url' => $dataUrl,
+                                    'url' => $apiDataUrl,
                                     'detail' => 'high' // Request high detail analysis
                                 ]
                             ]
                         ]
                     ]
                 ],
-                'max_tokens' => 800, // Increased for more detailed analysis
+                'max_tokens' => 1000, // Increased for more detailed analysis
             ]);
 
             $text = $response->choices[0]->message->content ?? '';
@@ -696,19 +733,26 @@ Always provide detailed, educational explanations and encourage learning through
                 str_contains(strtolower($text), "can't analyze") ||
                 str_contains(strtolower($text), "cannot analyze") ||
                 str_contains(strtolower($text), "i'm unable to") ||
-                str_contains(strtolower($text), "provide a description")
+                str_contains(strtolower($text), "i cannot") ||
+                str_contains(strtolower($text), "sorry, i can't") ||
+                str_contains(strtolower($text), "i'm having trouble") ||
+                str_contains(strtolower($text), "provide a description") ||
+                str_contains(strtolower($text), "convert the image") ||
+                str_contains(strtolower($text), "try converting") ||
+                str_contains(strtolower($text), "different format")
             ) {
 
-                return "⚠️ **Image Analysis Issue**\n\n" .
-                    "The AI vision system had difficulty analyzing this image. This might be due to:\n" .
-                    "• Image format compatibility issues\n" .
-                    "• Image quality or resolution problems\n" .
-                    "• Content that's difficult to process\n\n" .
-                    "**Suggestions:**\n" .
-                    "• Try converting the image to PNG or JPG format\n" .
-                    "• Ensure the image is clear and well-lit\n" .
-                    "• Try a different image or provide a text description\n\n" .
-                    "**Original response:** " . trim($text);
+                return "⚠️ **Image Processing Issue**\n\n" .
+                    "The AI had difficulty processing this specific image. This can happen with:\n" .
+                    "• Newer image formats (HEIC, HEIF, AVIF)\n" .
+                    "• Very large or very small images\n" .
+                    "• Images with unusual aspect ratios\n" .
+                    "• Corrupted or partially uploaded files\n\n" .
+                    "**Quick Fixes:**\n" .
+                    "• Try uploading as JPG or PNG instead\n" .
+                    "• Ensure good lighting and image quality\n" .
+                    "• Check that the file uploaded completely\n\n" .
+                    "**AI Response:** " . trim($text);
             }
 
             return "🔍 **Image Analysis:**\n" . trim($text);
