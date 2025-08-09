@@ -23,6 +23,12 @@
                         <i class="fas fa-robot mr-2 text-sm"></i>
                         AI Assistant
                     </a>
+
+                    <a href="{{ route('documentation') }}"
+                        class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-white hover:text-gray-300 hover:border-gray-300 focus:outline-none focus:text-gray-300 focus:border-gray-300 transition duration-150 ease-in-out">
+                        <i class="fas fa-book mr-2 text-sm"></i>
+                        Documentation
+                    </a>
                 </div>
             </div>
 
@@ -68,6 +74,11 @@
                             AI Assistant
                         </x-dropdown-link>
 
+                        <x-dropdown-link :href="route('documentation')" class="flex items-center">
+                            <i class="fas fa-book mr-2 text-sm text-gray-400"></i>
+                            Documentation
+                        </x-dropdown-link>
+
                         <div class="border-t border-gray-100"></div>
 
                         <!-- Authentication -->
@@ -108,6 +119,14 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link href="/ltuc/chatbot">
+                AI Assistant
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('documentation')">
+                Documentation
             </x-responsive-nav-link>
         </div>
 

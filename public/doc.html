@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🎓 LTUC AI Assistant – Project Overview</title>
+<meta name="description" content="LTUC AI Assistant — Intelligent Learning Companion for Modern Education. Built with Laravel 11, PHP 8.2+, TailwindCSS, OpenAI GPT-4o, Docker-ready." />
+
+<style>
+  /* ===== CSS Variables (LTUC Brand) ===== */
+  :root{
+    --pink:#d60095;
+    --green:#2e8570;
+    --purple:#a84a9d;
+    --dark:#333333;
+    --light:#999999;
+
+    --bg:#0f1115;
+    --card:#151922;
+    --ink:#e9ecf1;
+    --muted:#b9c1cc;
+
+    --gradient: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+    --radius: 16px;
+    --shadow: 0 10px 30px rgba(0,0,0,.25);
+  }
+
+  /* ===== Base ===== */
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;line-height:1.6}
+  a{color:#90c6ff;text-decoration:none}
+  a:hover{text-decoration:underline}
+  img{max-width:100%;height:auto}
+  code,kbd,pre{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+
+  /* ===== Layout ===== */
+  .container{max-width:1100px;margin:0 auto;padding:32px 20px}
+  .hero{
+    text-align:center;
+    background: radial-gradient(1200px 400px at 50% -200px, rgba(236,72,153,.18), transparent),
+                radial-gradient(1200px 400px at 50% -300px, rgba(139,92,246,.18), transparent);
+    padding:40px 20px 24px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .hero .logo{width:300px;border-radius:20px;box-shadow:var(--shadow)}
+  .title{font-size:40px;margin:16px 0 8px;letter-spacing:.2px}
+  .subtitle{color:var(--muted);margin:0 0 18px}
+  .badge-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0}
+  .deployments{
+    margin-top:16px;display:flex;flex-direction:column;gap:6px;align-items:center;color:var(--muted)
+  }
+  .toc{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin:28px 0}
+  .toc h2{margin:0 0 8px;font-size:18px;color:#fff}
+  .toc a{display:inline-block;margin:6px 10px 6px 0;padding:6px 10px;border:1px solid rgba(255,255,255,.1);border-radius:10px}
+  .section{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin:22px 0}
+  .section h2{margin-top:0}
+  .lead{color:#dbe3ee}
+
+  /* ===== Colored chips / labels ===== */
+  .chip{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.3px;padding:6px 10px;border-radius:999px;margin-right:8px}
+  .chip.pink{background:rgba(214,0,149,.15);color:#ffd9f0;border:1px solid rgba(214,0,149,.35)}
+  .chip.green{background:rgba(46,133,112,.15);color:#cff7e8;border:1px solid rgba(46,133,112,.35)}
+  .chip.purple{background:rgba(168,74,157,.15);color:#f2d8f0;border:1px solid rgba(168,74,157,.35)}
+
+  /* ===== Code blocks with gradient header ===== */
+  .code{
+    border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin:14px 0
+  }
+  .code .code-head{
+    background:var(--gradient);color:white;padding:10px 12px;font-weight:600;font-size:13px;
+    display:flex;align-items:center;justify-content:space-between
+  }
+  .code .copy{font-size:12px;border:0;background:rgba(255,255,255,.18);color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer}
+  .code pre{margin:0;padding:14px;background:#1e293b;color:#fff;overflow:auto}
+
+  /* ===== Tables ===== */
+  table{width:100%;border-collapse:collapse;margin:12px 0}
+  th,td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
+  th{background:rgba(255,255,255,.04);text-align:left}
+
+  /* ===== Lists spacing ===== */
+  ul,ol{margin:8px 0 8px 22px}
+  li{margin:6px 0}
+
+  /* ===== Utilities ===== */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .note{padding:12px;border-left:4px solid var(--pink);background:rgba(214,0,149,.08);border-radius:8px}
+
+  /* ===== Print Styles (for PDF) ===== */
+  @media print{
+    body{background:white;color:#111}
+    .hero{background:none;border-bottom:1px solid #ddd}
+    .section,.toc{box-shadow:none;border:1px solid #eee}
+    a{color:#0645ad;text-decoration:none}
+    .badge-row img{filter:grayscale(0)}
+    .code pre{background:#111;color:#f7f7f7}
+    .code .copy{display:none}
+    .toc a{border-color:#ddd}
+    .page-break{page-break-before:always}
+    @page{margin:16mm}
+    .no-break{page-break-inside:avoid}
+  }
+</style>
+
+<script>
+  // Lightweight copy buttons for code blocks (ignored in print)
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('[data-copy]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pre = btn.closest('.code').querySelector('pre');
+        const text = pre.innerText;
+        navigator.clipboard.writeText(text).then(() => {
+          const old = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(()=>btn.textContent = old, 1200);
+        });
+      });
+    });
+  });
+</script>
+</head>
+
+<body>
+  <header class="hero">
+    <img class="logo" src="./assets/images/LTUCBot.png" alt="LTUC AI Assistant Logo" />
+    <h1 class="title">🎓 LTUC AI Assistant</h1>
+    <p class="subtitle"><strong>Intelligent Learning Companion for Modern Education</strong></p>
+
+    <div class="badge-row">
+      <a href="https://laravel.com" target="_blank" rel="noopener">
+        <img alt="Laravel 11.31" src="https://img.shields.io/badge/Laravel-11.31-FF2D20?style=for-the-badge&logo=laravel&logoColor=white">
+      </a>
+      <a href="https://php.net" target="_blank" rel="noopener">
+        <img alt="PHP 8.2+" src="https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white">
+      </a>
+      <a href="https://docker.com" target="_blank" rel="noopener">
+        <img alt="Docker Ready" src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white">
+      </a>
+      <a href="https://openai.com" target="_blank" rel="noopener">
+        <img alt="OpenAI GPT-4o" src="https://img.shields.io/badge/OpenAI-GPT--4o-412991?style=for-the-badge&logo=openai&logoColor=white">
+      </a>
+      <a href="https://tailwindcss.com" target="_blank" rel="noopener">
+        <img alt="Tailwind 3.1" src="https://img.shields.io/badge/Tailwind-3.1-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white">
+      </a>
+    </div>
+
+    <div class="deployments">
+      <div><strong>🌐 Live Deployments</strong></div>
+      <div><strong>Production:</strong> <a href="https://ltucbot.up.railway.app/" target="_blank" rel="noopener">https://ltucbot.up.railway.app/</a></div>
+      <div><strong>Backup:</strong> <a href="https://ltucbot.onrender.com/" target="_blank" rel="noopener">https://ltucbot.onrender.com/</a></div>
+      <div><strong>Database:</strong> Hosted on <a href="https://clever-cloud.com" target="_blank" rel="noopener">Clever Cloud</a> MySQL</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Table of Contents -->
+    <nav class="toc no-break">
+      <h2>📋 Table of Contents</h2>
+      <a href="#about">About the Project</a>
+      <a href="#why-laravel">Why Laravel over Python?</a>
+      <a href="#features">Features</a>
+      <a href="#technologies">Technologies</a>
+      <a href="#installation">Installation</a>
+      <a href="#docker-deployment">Docker Deployment</a>
+      <a href="#configuration">Configuration</a>
+      <a href="#usage">Usage</a>
+      <a href="#file-processing">File Processing</a>
+      <a href="#api-integration">API Integration</a>
+      <a href="#contributing">Contributing</a>
+      <a href="#license">License</a>
+      <a href="#acknowledgments">Acknowledgments</a>
+      <a href="#support">Support</a>
+    </nav>
+
+    <!-- About -->
+    <section id="about" class="section">
+      <h2>🚀 About the Project</h2>
+      <p class="lead">LTUC AI Assistant is a cutting-edge educational platform that leverages OpenAI's GPT-4o model to provide intelligent academic support. Built with Laravel 11 and modern web technologies, it offers students 24/7 access to an AI-powered learning companion capable of processing multiple file formats and providing comprehensive educational assistance.</p>
+
+      <h3>🎯 Mission</h3>
+      <p>Transform the educational experience by providing instant, intelligent, and personalized academic support through advanced AI technology, while maintaining a robust, scalable, and user-friendly web application architecture.</p>
+
+      <h3>🌟 Project Highlights</h3>
+      <ul>
+        <li><strong>Multi-Platform Deployment</strong>: Running on Railway and Render for high availability</li>
+        <li><strong>Cloud Database</strong>: MySQL database hosted on Clever Cloud for reliability</li>
+        <li><strong>Enterprise-Grade Architecture</strong>: Built with Laravel for scalability and maintainability</li>
+        <li><strong>Modern UI/UX</strong>: Responsive design with TailwindCSS and mobile-first approach</li>
+        <li><strong>Advanced File Processing</strong>: Supports 30+ file formats with intelligent content extraction</li>
+        <li><strong>Real-time Chat</strong>: Persistent chat history with user authentication</li>
+      </ul>
+    </section>
+
+    <!-- Why Laravel -->
+    <section id="why-laravel" class="section">
+      <h2>🤔 Why Laravel over Python?</h2>
+      <p class="note"><strong>Note:</strong> While Python dominates AI/ML ecosystems, Laravel/PHP was selected to deliver a production-grade, feature-rich, web-first educational platform quickly and securely.</p>
+
+      <h3>🔐 Superior Authentication &amp; User Management</h3>
+      <ul>
+        <li><strong>Laravel Breeze</strong> out of the box</li>
+        <li>Secure sessions &amp; CSRF protection</li>
+        <li>Role-based access &amp; permissions</li>
+        <li>Password hashing, reset flows, email verification</li>
+      </ul>
+
+      <h3>🏗️ Rapid Web Development</h3>
+      <ul>
+        <li>MVC architecture for maintainability</li>
+        <li>Eloquent ORM &amp; relationships</li>
+        <li>Blade templating for dynamic UIs</li>
+        <li>Artisan CLI boosts developer velocity</li>
+      </ul>
+
+      <h3>🌐 Enterprise Web Features</h3>
+      <ul>
+        <li>Advanced routing, middleware, route caching</li>
+        <li>Database migrations &amp; version control</li>
+        <li>Queues for background jobs</li>
+        <li>Redis/Memcached caching</li>
+        <li>Cloud file storage (S3, etc.)</li>
+      </ul>
+
+      <h3>📊 Production-Ready Infrastructure</h3>
+      <ul>
+        <li>Mature ecosystem and packages</li>
+        <li>Horizontal scaling &amp; multi-server deploys</li>
+        <li>Logging, error handling, observability</li>
+        <li>OWASP protections baked in</li>
+        <li>Optimized request lifecycle</li>
+      </ul>
+
+      <h3>🔧 Development Experience</h3>
+      <ul>
+        <li>Vite hot reloading</li>
+        <li>PHPUnit testing</li>
+        <li>Composer &amp; npm</li>
+        <li>Laravel Sanctum for APIs</li>
+      </ul>
+
+      <h3>💡 Why Not Pure Python for Web?</h3>
+      <ul>
+        <li>Faster MVP due to prebuilt components</li>
+        <li>Extensive, beginner-friendly docs</li>
+        <li>Flexible hosting from shared to enterprise</li>
+        <li>Huge community and package ecosystem</li>
+      </ul>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="section">
+      <h2>✨ Features</h2>
+
+      <h3>🤖 Core AI Capabilities</h3>
+      <ul>
+        <li><strong>Advanced Conversational AI</strong> – GPT-4o for natural, intelligent responses</li>
+        <li><strong>Multi-Modal Processing</strong> – text, images, documents, spreadsheets</li>
+        <li><strong>Contextual Understanding</strong> – coherent, memory-aware interactions</li>
+        <li><strong>Educational Focus</strong> – tuned for learning scenarios</li>
+      </ul>
+
+      <h3>📁 File Processing Support</h3>
+      <ul>
+        <li><strong>Documents:</strong> PDF, DOCX, DOC, TXT, RTF</li>
+        <li><strong>Spreadsheets:</strong> XLSX, XLS, CSV</li>
+        <li><strong>Images:</strong> PNG, JPG, JPEG, GIF, BMP, WEBP</li>
+        <li><strong>Code Files:</strong> PHP, JS, Python, Java, C++, HTML, CSS, JSON, XML</li>
+        <li><strong>Data Formats:</strong> JSON, XML, YAML, SQL</li>
+        <li><strong>Archives:</strong> ZIP (content extraction)</li>
+        <li><strong>Notebooks:</strong> Jupyter (cell-by-cell analysis)</li>
+      </ul>
+
+      <h3>🔧 Advanced Features</h3>
+      <ul>
+        <li>Image analysis via GPT-4o Vision</li>
+        <li>Syntax-highlighted code rendering + copy</li>
+        <li>Markdown support</li>
+        <li>Drag-and-drop multi-file upload</li>
+        <li>Responsive Tailwind UI</li>
+        <li>Secure auth &amp; chat history</li>
+        <li>Real-time processing</li>
+      </ul>
+
+      <h3>🎨 User Experience</h3>
+      <ul>
+        <li>Dark theme code blocks</li>
+        <li>Pink→Purple gradient headers</li>
+        <li>Subtle hover/interaction states</li>
+        <li>Mobile-first</li>
+        <li>Copy to clipboard</li>
+        <li>Public demo mode</li>
+      </ul>
+    </section>
+
+    <!-- Technologies -->
+    <section id="technologies" class="section">
+      <h2>🛠 Technologies</h2>
+
+      <h3>Backend Framework</h3>
+      <ul>
+        <li><strong>Laravel 11.31</strong></li>
+        <li><strong>PHP 8.2+</strong></li>
+        <li><strong>MySQL</strong> (Clever Cloud)</li>
+        <li><strong>SQLite</strong> (dev)</li>
+        <li><strong>OpenAI PHP Client 0.15</strong></li>
+      </ul>
+
+      <h3>Frontend</h3>
+      <ul>
+        <li>TailwindCSS 3.1</li>
+        <li>Alpine.js 3.4</li>
+        <li>Vite 6.0</li>
+        <li>FontAwesome 6.5</li>
+        <li>Inter font (or system fallback)</li>
+      </ul>
+
+      <h3>File Processing Libraries</h3>
+      <ul>
+        <li>PHPOffice/PhpSpreadsheet 4.5</li>
+        <li>PHPOffice/PHPWord 1.4</li>
+        <li>Smalot/PdfParser 2.12</li>
+        <li>Spatie/PDF-to-Text 1.54</li>
+        <li>League/CommonMark 2.7</li>
+      </ul>
+
+      <h3>Dev Tools</h3>
+      <ul>
+        <li>Laravel Breeze 2.3</li>
+        <li>Laravel Pint 1.13</li>
+        <li>PHPUnit 11.0</li>
+        <li>Faker</li>
+      </ul>
+    </section>
+
+    <!-- Docker Deployment (first detailed block) -->
+    <section id="docker-deployment" class="section">
+      <h2>🐳 Docker Deployment</h2>
+      <p>The project includes comprehensive Docker configuration optimized for production deployment on Railway and Render.</p>
+
+      <h3>Multi-Stage Dockerfile</h3>
+
+      <div class="code">
+        <div class="code-head">
+          <span>Stage 1: Frontend Asset Building (Node.js 20)</span>
+          <button class="copy" data-copy>Copy</button>
+        </div>
+<pre><code>FROM node:20 AS assets
+# Builds Vite assets with support for npm, yarn, or pnpm
+# Automatically detects package manager and uses frozen lockfiles
+# Outputs optimized production assets
+</code></pre>
+      </div>
+
+      <div class="code">
+        <div class="code-head">
+          <span>Stage 2: PHP Application (PHP 8.3-CLI)</span>
+          <button class="copy" data-copy>Copy</button>
+        </div>
+<pre><code>FROM php:8.3-cli
+# Installs required PHP extensions: PDO, MySQL, GD, ZIP, Intl, BCMath
+# Configures file upload limits (10MB)
+# Optimizes for production with --no-dev dependencies
+</code></pre>
+      </div>
+
+      <h3>Key Docker Features</h3>
+      <ul>
+        <li>PHP 8.3-CLI with extensions: <code>gd</code>, <code>zip</code>, <code>pdo_mysql</code>, <code>bcmath</code>, <code>intl</code></li>
+        <li>Node.js 20 for building assets</li>
+        <li>Composer 2</li>
+        <li>Auto-detect npm/yarn/pnpm</li>
+        <li>File uploads up to 10MB</li>
+        <li>Production-optimized layers</li>
+        <li>Smart caching</li>
+        <li>Flexible port via <code>PORT</code></li>
+      </ul>
+
+      <div class="grid-2">
+        <div class="section" style="padding:16px">
+          <h4>Docker Configuration Details</h4>
+<pre><code># PHP Extensions Installed
+pdo pdo_mysql zip gd intl bcmath
+
+# File Upload Settings
+upload_max_filesize = 10M
+post_max_size = 10M
+
+# Production Optimizations
+composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+# Port Configuration
+EXPOSE 10000
+CMD php artisan serve --host=0.0.0.0 --port=${PORT}
+</code></pre>
+        </div>
+        <div class="section" style="padding:16px">
+          <h4>Quick Docker Commands</h4>
+<pre><code># Build the image
+docker build -t ltuc-ai-assistant .
+
+# Run locally
+docker run -p 10000:10000 --env-file .env ltuc-ai-assistant
+
+# Access application
+http://localhost:10000
+</code></pre>
+        </div>
+      </div>
+
+      <h3>Production Deployment</h3>
+      <h4>Railway</h4>
+      <ol>
+        <li>Connect GitHub repository to Railway</li>
+        <li>Set environment variables (OpenAI key, DB credentials)</li>
+        <li>Deploy (Dockerfile auto-detected)</li>
+        <li>Access: <a href="https://ltucbot.up.railway.app/" target="_blank" rel="noopener">ltucbot.up.railway.app</a></li>
+      </ol>
+
+      <h4>Render</h4>
+      <ol>
+        <li>Create Web Service</li>
+        <li>Connect GitHub repository</li>
+        <li>Build via Dockerfile</li>
+        <li>Access: <a href="https://ltucbot.onrender.com/" target="_blank" rel="noopener">ltucbot.onrender.com</a></li>
+      </ol>
+
+      <h4>Database (Clever Cloud)</h4>
+      <ol>
+        <li>Create MySQL instance</li>
+        <li>Copy credentials</li>
+        <li>Set env vars</li>
+        <li>Run <code>php artisan migrate</code></li>
+      </ol>
+    </section>
+
+    <!-- Installation -->
+    <section id="installation" class="section">
+      <h2>🚀 Installation</h2>
+
+      <h3>Prerequisites</h3>
+      <ul>
+        <li>PHP 8.2+</li>
+        <li>Composer</li>
+        <li>Node.js 18+ &amp; npm</li>
+        <li>MySQL or SQLite</li>
+        <li>OpenAI API Key</li>
+      </ul>
+
+      <h3>Step 1: Clone</h3>
+      <div class="code">
+        <div class="code-head"><span>Git</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>git clone https://github.com/osamaalkhazali/LTUCBot.git
+cd LTUCBot
+</code></pre>
+      </div>
+
+      <h3>Step 2: Dependencies</h3>
+      <div class="code">
+        <div class="code-head"><span>Composer &amp; npm</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>composer install
+npm install
+</code></pre>
+      </div>
+
+      <h3>Step 3: Environment</h3>
+      <div class="code">
+        <div class="code-head"><span>.env &amp; App Key</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>cp .env.example .env
+php artisan key:generate
+</code></pre>
+      </div>
+
+      <h3>Step 4: Database</h3>
+      <div class="code">
+        <div class="code-head"><span>Migrate &amp; Seed</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>php artisan migrate
+# Optional:
+php artisan db:seed
+</code></pre>
+      </div>
+
+      <h3>Step 5: Build Assets</h3>
+      <div class="code">
+        <div class="code-head"><span>Dev / Prod</span><button class="copy" data-copy>Copy</button></div>
+<pre><code># Development
+npm run dev
+
+# Production
+npm run build
+</code></pre>
+      </div>
+
+      <h3>Step 6: Start</h3>
+      <div class="code">
+        <div class="code-head"><span>Serve</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>php artisan serve
+# in another terminal
+npm run dev
+</code></pre>
+      </div>
+    </section>
+
+    <!-- Docker Setup for Render (second block as in README) -->
+    <section class="section">
+      <h2>🐳 Docker Setup for Render</h2>
+      <h3>Dockerfile</h3>
+      <div class="code">
+        <div class="code-head"><span>Render Dockerfile</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>FROM php:8.2-cli
+
+RUN apt-get update && apt-get install -y \
+    unzip \
+    libpq-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    &amp;&amp; docker-php-ext-install pdo pdo_mysql zip gd
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+COPY . .
+
+RUN composer install --no-dev --optimize-autoloader
+
+EXPOSE 10000
+CMD php artisan serve --host=0.0.0.0 --port=10000
+</code></pre>
+      </div>
+
+      <h3>.dockerignore</h3>
+      <div class="code">
+        <div class="code-head"><span>.dockerignore</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>vendor
+node_modules
+.env
+</code></pre>
+      </div>
+
+      <h3>Local Docker Commands</h3>
+      <div class="code">
+        <div class="code-head"><span>Local Run</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>docker build -t ltuc-ai-assistant .
+docker run -p 10000:10000 --env-file .env ltuc-ai-assistant
+# Open http://localhost:10000
+</code></pre>
+      </div>
+
+      <h3>Render Deployment</h3>
+      <ol>
+        <li>Commit Dockerfile &amp; .dockerignore</li>
+        <li>Create Render Service and connect repo</li>
+        <li>Configure environment variables</li>
+        <li>Deploy</li>
+      </ol>
+    </section>
+
+    <!-- Configuration -->
+    <section id="configuration" class="section">
+      <h2>⚙️ Configuration</h2>
+
+      <h3>Environment Variables</h3>
+      <div class="code">
+        <div class="code-head"><span>.env Template</span><button class="copy" data-copy>Copy</button></div>
+<pre><code># Application
+APP_NAME="LTUC AI Assistant"
+APP_ENV=production
+APP_KEY=base64:your-generated-key
+APP_DEBUG=false
+APP_URL=https://ltucbot.up.railway.app
+
+# Database (Clever Cloud MySQL)
+DB_CONNECTION=mysql
+DB_HOST=your-clever-cloud-host
+DB_PORT=3306
+DB_DATABASE=your-database-name
+DB_USERNAME=your-username
+DB_PASSWORD=your-password
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_ORGANIZATION=your_org_id_optional
+
+# Mail Configuration
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-email
+MAIL_PASSWORD=your-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@ltucbot.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+# Session Configuration
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+
+# Cache & Queue
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync
+
+# File Upload Limits
+UPLOAD_MAX_FILESIZE=10M
+POST_MAX_SIZE=10M
+</code></pre>
+      </div>
+
+      <h3>OpenAI API Setup</h3>
+      <ol>
+        <li>Get API key from OpenAI</li>
+        <li>Create new secret key</li>
+        <li>Add to <code>OPENAI_API_KEY</code> in <code>.env</code></li>
+        <li>Configure billing &amp; usage limits</li>
+      </ol>
+
+      <h3>File Upload Configuration</h3>
+      <div class="code">
+        <div class="code-head"><span>PHP.ini Snippet</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>upload_max_filesize = 10M
+post_max_size = 10M
+max_execution_time = 300
+memory_limit = 512M
+</code></pre>
+      </div>
+    </section>
+
+    <!-- Usage -->
+    <section id="usage" class="section">
+      <h2>📖 Usage</h2>
+
+      <h3>Access the Application</h3>
+      <ol>
+        <li><strong>Production:</strong> <a href="https://ltucbot.up.railway.app/" target="_blank" rel="noopener">https://ltucbot.up.railway.app/</a></li>
+        <li><strong>Demo Mode:</strong> Try chatbot without registration</li>
+        <li><strong>Full Features:</strong> Register for history &amp; file uploads</li>
+      </ol>
+
+      <h3>Basic Interaction</h3>
+      <ol>
+        <li><strong>Register/Login</strong> – or use demo mode</li>
+        <li><strong>Start Chatting</strong> – type questions, upload files, receive formatted responses</li>
+      </ol>
+
+      <h3>File Upload Examples</h3>
+      <ul>
+        <li>Documents, Code files, Images, Data files</li>
+      </ul>
+
+      <h3>Chat Features</h3>
+      <ul>
+        <li>Persistent History &amp; Multiple Chats</li>
+        <li>Attachments per message</li>
+        <li>Mobile responsive</li>
+      </ul>
+
+      <h3>Sample Interactions</h3>
+      <div class="grid-2">
+        <div class="section" style="padding:16px">
+<pre><code>"Explain the concept of object-oriented programming"
+"Help me understand calculus derivatives"
+"What are the best practices for Laravel development?"
+</code></pre>
+        </div>
+        <div class="section" style="padding:16px">
+<pre><code>"Analyze this code and suggest improvements" + upload .php
+"Extract key points from this PDF" + upload document
+"What does this diagram show?" + upload image
+"Summarize this spreadsheet" + upload .xlsx
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- File Processing -->
+    <section id="file-processing" class="section">
+      <h2>📄 File Processing</h2>
+
+      <h3>Supported File Types</h3>
+      <table>
+        <thead>
+          <tr><th>Category</th><th>Extensions</th><th>Processing</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Documents</strong></td><td>.pdf, .docx, .doc, .txt, .rtf</td><td>Text extraction + AI analysis</td></tr>
+          <tr><td><strong>Spreadsheets</strong></td><td>.xlsx, .xls, .csv</td><td>Data parsing + structure analysis</td></tr>
+          <tr><td><strong>Images</strong></td><td>.png, .jpg, .jpeg, .gif, .bmp, .webp</td><td>GPT-4o Vision API</td></tr>
+          <tr><td><strong>Code</strong></td><td>.php, .js, .py, .java, .cpp, .html, .css</td><td>Syntax-aware processing</td></tr>
+          <tr><td><strong>Data</strong></td><td>.json, .xml, .yaml, .sql</td><td>Structure-aware parsing</td></tr>
+          <tr><td><strong>Archives</strong></td><td>.zip</td><td>Content extraction + analysis</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Processing Features</h3>
+      <ul>
+        <li>Automatic type detection</li>
+        <li>Robust content extraction</li>
+        <li>Image OCR &amp; visual understanding</li>
+        <li>Error handling &amp; fallbacks</li>
+        <li>Configurable size limits (default 10MB images)</li>
+      </ul>
+    </section>
+
+    <!-- API Integration -->
+    <section id="api-integration" class="section">
+      <h2>🔌 API Integration</h2>
+
+      <h3>OpenAI Configuration</h3>
+      <div class="code">
+        <div class="code-head"><span>Chat &amp; Vision Models</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>// Chat Completions
+'model' => 'gpt-4o',
+'max_tokens' => 16000,
+'temperature' => 0.7
+
+// Vision API (for images)
+'model' => 'gpt-4o-mini',
+'detail' => 'high'
+</code></pre>
+      </div>
+
+      <h3>Custom Controllers</h3>
+      <p><strong>ChatbotController.php</strong> – Handles messages, context, file uploads/analysis, Markdown parsing, and errors.</p>
+
+      <h3>Response Formatting</h3>
+      <ul>
+        <li>Raw text</li>
+        <li>HTML (parsed markdown)</li>
+        <li>Code blocks with copy</li>
+        <li>Structured file analysis</li>
+      </ul>
+    </section>
+
+    <!-- Customization -->
+    <section class="section">
+      <h2>🎨 Customization</h2>
+
+      <h3>Brand Colors</h3>
+      <div class="grid-3">
+        <div class="section" style="padding:14px;background:rgba(214,0,149,.12)"><strong>Pink</strong><br><code>#d60095</code></div>
+        <div class="section" style="padding:14px;background:rgba(46,133,112,.12)"><strong>Green</strong><br><code>#2e8570</code></div>
+        <div class="section" style="padding:14px;background:rgba(168,74,157,.12)"><strong>Purple</strong><br><code>#a84a9d</code></div>
+      </div>
+      <div class="grid-2">
+        <div class="section" style="padding:16px">
+          <h4>CSS Snippet</h4>
+<pre><code>/* LTUC Brand Colors */
+.ltuc-primary { background-color: #d60095; } /* Pink */
+.ltuc-secondary { background-color: #2e8570; } /* Green */
+.ltuc-accent { background-color: #a84a9d; } /* Purple */
+.ltuc-dark { background-color: #333333; } /* Dark Gray */
+.ltuc-light { background-color: #999999; } /* Light Gray */
+</code></pre>
+        </div>
+        <div class="section" style="padding:16px">
+          <h4>Code Block Theme</h4>
+<pre><code>/* Code blocks with ChatGPT-like appearance */
+.code-block-header {
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+  color: white;
+}
+.code-block-content {
+  background: #1e293b;
+  color: white;
+}
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contributing -->
+    <section id="contributing" class="section">
+      <h2>🤝 Contributing</h2>
+
+      <h3>Development Workflow</h3>
+      <ol>
+        <li>Fork the repository</li>
+        <li>Create a feature branch: <code>git checkout -b feature/amazing-feature</code></li>
+        <li>Make changes (PSR-12)</li>
+        <li>Run tests</li>
+        <li>Open a PR with details</li>
+      </ol>
+
+      <h3>Code Standards</h3>
+      <ul>
+        <li>PSR-12</li>
+        <li>Laravel conventions</li>
+        <li>Document complex logic</li>
+        <li>Write tests for new features</li>
+      </ul>
+
+      <h3>Setting up Dev Environment</h3>
+      <div class="code">
+        <div class="code-head"><span>Dev Commands</span><button class="copy" data-copy>Copy</button></div>
+<pre><code>composer install --dev
+npm install --dev
+php artisan migrate --env=testing
+php artisan serve --env=local
+</code></pre>
+      </div>
+    </section>
+
+    <!-- License -->
+    <section id="license" class="section">
+      <h2>📄 License</h2>
+      <p>This project is open-sourced software licensed under the <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener">MIT license</a>.</p>
+    </section>
+
+    <!-- Acknowledgments -->
+    <section id="acknowledgments" class="section">
+      <h2>🙏 Acknowledgments</h2>
+      <ul>
+        <li>OpenAI for GPT-4o</li>
+        <li>Laravel Community</li>
+        <li>Railway &amp; Render</li>
+        <li>Clever Cloud</li>
+        <li>LTUC</li>
+      </ul>
+    </section>
+
+    <!-- Support -->
+    <section id="support" class="section">
+      <h2>💬 Support</h2>
+      <ul>
+        <li><strong>Issues:</strong> <a href="https://github.com/osamaalkhazali/LTUCBot/issues" target="_blank" rel="noopener">GitHub Issues</a></li>
+        <li><strong>Documentation:</strong> This page &amp; inline code comments</li>
+        <li><strong>Live Demo:</strong> <a href="https://ltucbot.up.railway.app/" target="_blank" rel="noopener">https://ltucbot.up.railway.app/</a></li>
+      </ul>
+    </section>
+
+    <section class="section no-break" style="text-align:center">
+      <span class="chip pink">Built with ❤️ for Education</span>
+      <span class="chip purple">Laravel &amp; OpenAI</span>
+      <span class="chip green">© 2025 LTUC AI Assistant</span>
+      <p style="margin-top:10px;color:var(--muted)">© 2025 LTUC AI Assistant. All rights reserved.</p>
+    </section>
+  </main>
+</body>
+</html>

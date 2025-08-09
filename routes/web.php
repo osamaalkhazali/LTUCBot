@@ -35,4 +35,9 @@ Route::middleware('auth')->group(function () {
 Route::get('/ltuc/chatbot-demo', [ChatbotDemoController::class, 'index'])->name('ltuc.chatbot.demo');
 Route::post('/api/chat-demo', [ChatbotDemoController::class, 'chat'])->middleware('throttle:10,1')->name('api.chat.demo');
 
+// Documentation Route
+Route::get('/documentation', function () {
+    return view('documentation');
+})->name('documentation');
+
 require __DIR__ . '/auth.php';

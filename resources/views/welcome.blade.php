@@ -136,6 +136,10 @@
                     <!-- Navigation Links -->
                     @if (Route::has('login'))
                         <div class="flex items-center space-x-4">
+                            <a href="{{ route('documentation') }}"
+                                class="text-white hover:text-gray-300 transition duration-300 font-medium">
+                                Documentation
+                            </a>
                             @auth
                                 <a href="{{ url('/dashboard') }}"
                                     class="text-white hover:text-gray-300 transition duration-300 font-medium">
@@ -206,6 +210,13 @@
                             <i class="fas fa-redo group-hover:rotate-180 transition duration-300"></i>
                         </a>
                     @endauth
+
+                    <!-- Documentation Button - Always Visible -->
+                    <a href="{{ route('documentation') }}"
+                        class="group px-8 py-4 bg-white text-ltuc-dark border-2 border-gray-300 rounded-xl font-semibold text-lg hover:bg-gray-50 transform hover:scale-105 transition duration-300 flex items-center space-x-3">
+                        <span>Documentation</span>
+                        <i class="fas fa-book group-hover:rotate-12 transition duration-300"></i>
+                    </a>
                 </div>
 
                 <!-- Feature Preview -->
