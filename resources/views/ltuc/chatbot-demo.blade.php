@@ -1053,11 +1053,6 @@
                                 class="w-9 h-9 bg-white hover:bg-[#2E8570]/10 border border-gray-200 hover:border-[#2E8570]/40 rounded-xl flex items-center justify-center transition-all group">
                                 <i class="fas fa-image text-gray-500 group-hover:text-[#2E8570] text-sm"></i>
                             </button>
-
-                            <button id="voiceBtn" title="Voice Message"
-                                class="w-9 h-9 bg-white hover:bg-[#A84A9D]/10 border border-gray-200 hover:border-[#A84A9D]/40 rounded-xl flex items-center justify-center transition-all group">
-                                <i class="fas fa-microphone text-gray-500 group-hover:text-[#A84A9D] text-sm"></i>
-                            </button>
                         </div>
 
                         <div class="flex items-center text-xs text-gray-500">
@@ -1097,7 +1092,6 @@
         const clearBtn = document.getElementById('clearBtn');
         const fileBtn = document.getElementById('fileBtn');
         const imageBtn = document.getElementById('imageBtn');
-        const voiceBtn = document.getElementById('voiceBtn');
         const filePreviewRow = document.getElementById('filePreviewRow');
         const fileChips = document.getElementById('fileChips');
         const charCount = document.getElementById('charCount');
@@ -1563,7 +1557,7 @@
             showTyping();
 
             try {
-                const response = await fetch('/api/chat', {
+                const response = await fetch('/api/chat-demo', {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -1660,30 +1654,6 @@
 
             // Update the character count display
             autoResize();
-
-            // Clear conversation history on server
-            fetch('/api/chat/clear-history', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                }).then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log('Conversation history cleared successfully');
-                        // Update history status
-                        const historyStatus = document.getElementById('historyStatus');
-                        if (historyStatus) {
-                            historyStatus.textContent = 'New conversation started';
-                            setTimeout(() => {
-                                historyStatus.textContent = 'Conversation history active';
-                            }, 3000);
-                        }
-                    }
-                }).catch(error => {
-                    console.error('Error clearing conversation history:', error);
-                });
         }
 
         // Event Listeners
@@ -1721,13 +1691,6 @@
                 'image');
         });
 
-        voiceBtn?.addEventListener('click', () => {
-            // Voice message simulation
-            messageInput.value = "🎤 Voice message recorded (Demo feature)";
-            autoResize();
-            messageInput.focus();
-        });
-
         // Make removeFile globally accessible
         window.removeFile = removeFile;
 
@@ -1755,9 +1718,9 @@
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                     ${[1,2,3,4,5,6].map(i => (
                         `<div class=\"border border-gray-100 rounded-lg p-3 bg-white flex flex-col items-center justify-center h-28\">
-                                                                                                        <i class=\"fas fa-image ${i % 2 ? 'text-[#2E8570]' : 'text-[#D60095]'}\"></i>
-                                                                                                        <span class=\"text-xs text-gray-500 mt-2\">Image ${i}</span>
-                                                                                                    </div>`
+                                                                                                            <i class=\"fas fa-image ${i % 2 ? 'text-[#2E8570]' : 'text-[#D60095]'}\"></i>
+                                                                                                            <span class=\"text-xs text-gray-500 mt-2\">Image ${i}</span>
+                                                                                                        </div>`
                     )).join('')}
                 </div>`;
             openModal('Generated Images', grid);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use OpenAI;
 
@@ -215,7 +216,9 @@ class ChatbotController extends Controller
 
     public function index()
     {
-        return view('ltuc.chatbot');
+        return view('ltuc.chatbot', [
+            'userName' => Auth::user()->name ?? 'Guest'
+        ]);
     }
 
     public function chat(Request $request): JsonResponse
@@ -255,7 +258,8 @@ class ChatbotController extends Controller
             $validationRules = [
                 'files'     => 'nullable|array|max:5',
                 'files.*'   => 'file|max:10240', // 10MB
-                'clear_history' => 'nullable|boolean'
+                'clear_history' => 'nullable|boolean',
+                'user_name' => 'nullable|string|max:255'
             ];
 
             if ($hasFiles && !$hasMessage) {
@@ -279,6 +283,9 @@ class ChatbotController extends Controller
 
             $userMessage = $request->string('message')->toString();
 
+            // Get user name for personalization
+            $userName = $request->string('user_name')->toString() ?: 'Student';
+
             // Generate intelligent analysis prompt for file-only uploads
             if (!$hasMessage && $hasFiles) {
                 $userMessage = $this->generateFileAnalysisPrompt($request->file('files'));
@@ -288,7 +295,7 @@ class ChatbotController extends Controller
             $messages = [
                 [
                     'role'    => 'system',
-                    'content' => 'You are LTUC Assistant, an AI learning companion for Luminus Technical University College (LTUC). You help students with academic questions, course information, study guidance, and educational support. Be helpful, encouraging, and professional in your responses.
+                    'content' => "You are LTUC Assistant, an AI learning companion for Luminus Technical University College (LTUC). You are currently helping {$userName}. Address them by name when appropriate and be helpful, encouraging, and professional in your responses.
 
 🚀 ENHANCED FILE PROCESSING CAPABILITIES:
 
@@ -343,7 +350,7 @@ Use markdown formatting to make your responses clear and well-structured:
 🧠 **CONVERSATION CONTEXT:**
 You have access to the full conversation history. Reference previous messages, files, and analyses when relevant to provide coherent, contextual responses. If a user asks about something from earlier in the conversation, refer back to it appropriately.
 
-Always provide detailed, educational explanations and encourage learning through practical examples.'
+Always provide detailed, educational explanations and encourage learning through practical examples."
                 ]
             ];
 

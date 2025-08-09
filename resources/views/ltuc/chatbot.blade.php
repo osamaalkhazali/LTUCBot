@@ -844,20 +844,28 @@
             </button>
         </div>
 
-        <!-- Sidebar Content: Tabs Only -->
+        <!-- Sidebar Content: Chat History -->
         <div class="p-6 flex-1 flex flex-col">
-            <!-- Tabs (stacked) -->
-            <div class="mb-4 space-y-2">
-                <button id="tabImages"
-                    class="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
-                    <span class="text-sm font-medium text-gray-700">Generated Images</span>
-                    <i class="fas fa-chevron-right text-gray-400"></i>
-                </button>
-                <button id="tabFavorites"
-                    class="w-full flex items-center justify-between p-3 rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
-                    <span class="text-sm font-medium text-gray-700">Study Tools</span>
-                    <i class="fas fa-chevron-right text-gray-400"></i>
-                </button>
+            <!-- Chat History Section -->
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                    <i class="fas fa-history text-ltuc-primary mr-2"></i>
+                    Chat History
+                </h3>
+
+                <!-- Empty State -->
+                <div id="chatHistoryContent" class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="text-gray-400 mb-2">
+                        <i class="fas fa-comments text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-1">No previous conversations</p>
+                    <p class="text-xs text-gray-400">Your chat history will appear here</p>
+                </div>
+
+                <!-- History will be populated here when available -->
+                <div id="historyList" class="space-y-2 hidden">
+                    <!-- Dynamic history items will be inserted here -->
+                </div>
             </div>
         </div>
 
@@ -928,10 +936,7 @@
                 </div>
                 <div class="bg-white rounded-2xl rounded-tl-sm p-4 shadow-sm max-w-2xl border border-gray-100 message-content">
                     <p class="text-gray-800 leading-relaxed">
-                        Welcome to LTUC Learning Assistant! 🎓 I'm here to help you with information about our programs,
-                        courses, and academic support.
-                        <br><br>
-                        How can I assist you with your studies at Luminus Technical University College today?
+                        Hi {{ $userName }}! 👋 I'm your LTUC AI Assistant. How can I help you today?
                     </p>
                     <div class="text-xs text-gray-500 mt-2">Just now</div>
                 </div>
@@ -1038,6 +1043,8 @@
         // Global variables
         let uploadedFiles = [];
         let toasterCount = 0;
+        let isSending = false;
+        const userName = @json($userName);
 
         // DOM Elements
         const messageInput = document.getElementById('messageInput');
@@ -1052,9 +1059,9 @@
         const fileChips = document.getElementById('fileChips');
         const charCount = document.getElementById('charCount');
         const toasterContainer = document.getElementById('toasterContainer');
-        // Sidebar buttons & modal
-        const tabImages = document.getElementById('tabImages');
-        const tabFavorites = document.getElementById('tabFavorites');
+        // Sidebar elements
+        const chatHistoryContent = document.getElementById('chatHistoryContent');
+        const historyList = document.getElementById('historyList');
         const sidebarModal = document.getElementById('sidebarModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
@@ -1416,8 +1423,6 @@
         }
 
         // Send message
-        let isSending = false; // Track if a message is currently being sent
-
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text && uploadedFiles.length === 0) return;
@@ -1470,6 +1475,7 @@
             // Prepare form data for API
             const formData = new FormData();
             formData.append('message', text);
+            formData.append('user_name', userName);
 
             // Add files to form data
             uploadedFiles.forEach((item, index) => {
@@ -1660,32 +1666,6 @@
         modalClose?.addEventListener('click', closeModal);
         sidebarModal?.addEventListener('click', (e) => {
             if (e.target === sidebarModal) closeModal();
-        });
-
-        // Button click -> open modal
-        tabImages?.addEventListener('click', () => {
-            const grid = `
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    ${[1,2,3,4,5,6].map(i => (
-                        `<div class=\"border border-gray-100 rounded-lg p-3 bg-white flex flex-col items-center justify-center h-28\">
-                                                                                <i class=\"fas fa-image ${i % 2 ? 'text-[#2E8570]' : 'text-[#D60095]'}\"></i>
-                                                                                <span class=\"text-xs text-gray-500 mt-2\">Image ${i}</span>
-                                                                            </div>`
-                    )).join('')}
-                </div>`;
-            openModal('Generated Images', grid);
-        });
-
-        tabFavorites?.addEventListener('click', () => {
-            const list = `
-                <div class="space-y-4 text-center">
-                    <div class="text-gray-500">
-                        <i class="fas fa-tools text-4xl mb-4"></i>
-                        <h3 class="text-lg font-medium">Study Tools</h3>
-                        <p class="text-sm">Additional study resources and tools will be available here soon.</p>
-                    </div>
-                </div>`;
-            openModal('Study Tools', list);
         });
 
         // Code copy functionality
