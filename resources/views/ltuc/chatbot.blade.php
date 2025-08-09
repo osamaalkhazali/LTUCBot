@@ -733,6 +733,28 @@
                 overflow-x: hidden;
             }
 
+            /* Ensure header is visible on mobile */
+            .bg-black.text-white.border-b {
+                padding: 1rem !important;
+                min-height: 4rem !important;
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            /* Make hamburger button more visible */
+            #openSidebar {
+                width: 2.5rem !important;
+                height: 2.5rem !important;
+                margin-right: 0.75rem !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            }
+
+            #openSidebar i {
+                font-size: 1.125rem !important;
+                color: white !important;
+            }
+
             /* Message containers on mobile */
             .message-content {
                 max-width: calc(100vw - 100px);
@@ -867,6 +889,161 @@
 
         /* Sidebar responsive behavior */
         @media (max-width: 768px) {
+            /* Mobile body layout fix */
+            body {
+                flex-direction: column !important;
+                height: 100vh !important;
+                overflow: hidden !important;
+            }
+
+            /* Ensure sidebar is properly positioned */
+            #sidebar {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100vh !important;
+                width: 20rem !important;
+                z-index: 50 !important;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            #sidebar.open {
+                transform: translateX(0);
+            }
+
+            /* Fix sidebar header layout on mobile */
+            #sidebar .p-6.border-b.border-gray-100.bg-black {
+                padding: 1.5rem !important;
+                display: flex !important;
+                flex-direction: column !important;
+                background-color: #000000 !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            }
+
+            /* Ensure logo container is properly spaced */
+            #sidebar .flex.items-center.mb-4 {
+                display: flex !important;
+                align-items: center !important;
+                margin-bottom: 1rem !important;
+                width: 100% !important;
+            }
+
+            /* Ensure logo is visible and properly sized */
+            #sidebar .flex.items-center.mb-4 img {
+                height: 2rem !important;
+                width: auto !important;
+                max-width: 80% !important;
+                display: block !important;
+                object-fit: contain !important;
+            }
+
+            /* Ensure New Chat button is on separate line and full width */
+            #newChatBtn {
+                display: block !important;
+                width: 100% !important;
+                padding: 0.75rem 1rem !important;
+                margin-top: 0 !important;
+                background-color: #D60095 !important;
+                color: white !important;
+                border-radius: 0.75rem !important;
+                font-weight: 500 !important;
+                text-align: center !important;
+                border: none !important;
+            }
+
+            /* Ensure Chat History section is properly spaced */
+            #sidebar .p-6.flex-1.flex.flex-col.overflow-hidden {
+                padding: 1.5rem !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+
+            /* Ensure main chat area takes full space and header is visible */
+            .flex-1.flex.flex-col.min-w-0 {
+                width: 100% !important;
+                height: 100vh !important;
+                position: relative !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+
+            /* Force header visibility and proper styling */
+            .bg-black.text-white.border-b {
+                position: relative !important;
+                z-index: 10 !important;
+                flex-shrink: 0 !important;
+                width: 100% !important;
+                background-color: #000000 !important;
+                color: white !important;
+                display: flex !important;
+                padding: 1rem !important;
+                min-height: 4rem !important;
+            }
+
+            /* Ensure header content is visible */
+            .bg-black .flex.items-center.justify-between {
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+            }
+
+            .bg-black .flex.items-center {
+                display: flex !important;
+                align-items: center !important;
+            }
+
+            /* Force hamburger button visibility */
+            #openSidebar {
+                display: flex !important;
+                width: 2.5rem !important;
+                height: 2.5rem !important;
+                margin-right: 0.75rem !important;
+                background-color: rgba(255, 255, 255, 0.1) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                border-radius: 0.5rem !important;
+                align-items: center !important;
+                justify-content: center !important;
+                color: white !important;
+            }
+
+            #openSidebar i {
+                font-size: 1.125rem !important;
+                color: white !important;
+                display: block !important;
+            }
+
+            /* Force logo visibility */
+            .bg-black img {
+                height: 1.4rem !important;
+                width: auto !important;
+                display: block !important;
+            }
+
+            /* Force title visibility */
+            .bg-black h2 {
+                font-size: 1.125rem !important;
+                font-weight: bold !important;
+                color: white !important;
+                display: block !important;
+                margin: 0 !important;
+            }
+
+            .bg-black p {
+                font-size: 0.75rem !important;
+                color: #d1d5db !important;
+                display: block !important;
+                margin: 0 !important;
+            }
+
+            /* Fix chat messages area */
+            #chatMessages {
+                flex: 1 !important;
+                overflow-y: auto !important;
+                height: calc(100vh - 120px) !important; /* Account for header and input */
+            }
+
             .sidebar-backdrop {
                 display: block;
                 position: fixed;
@@ -877,15 +1054,6 @@
 
             .sidebar-backdrop.hidden {
                 display: none;
-            }
-
-            #sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease-in-out;
-            }
-
-            #sidebar.open {
-                transform: translateX(0);
             }
         }
 
@@ -934,32 +1102,40 @@
     <div id="sidebar"
         class="fixed inset-y-0 left-0 w-80 bg-white shadow-lg flex flex-col z-40 transform -translate-x-full transition-transform md:static md:translate-x-0">
         <!-- Sidebar Header -->
-        <div class="p-6 border-b border-gray-100 bg-black text-white relative">
+        <div class="p-6 border-b border-gray-100 bg-black text-white relative flex-shrink-0">
             <!-- Close (mobile) -->
             <button id="closeSidebar"
                 class="md:hidden absolute top-4 right-4 w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center"
                 aria-label="Close sidebar">
                 <i class="fas fa-times text-white"></i>
             </button>
+
+            <!-- Logo -->
             <div class="flex items-center mb-4">
                 <img src="{{ asset('assets/images/LTUCBot.png') }}" alt="LTUC" class="h-10 w-auto" />
             </div>
 
-            <button id="newChatBtn"
-                class="w-full ltuc-primary text-white py-3 px-4 rounded-xl font-medium hover:opacity-90 transition-opacity">
-                <i class="fas fa-plus mr-2"></i>
-                New Chat
-            </button>
+            <!-- New Chat Button - Full Width on New Line -->
+            <div class="w-full">
+                <button id="newChatBtn"
+                    class="w-full ltuc-primary text-white py-3 px-4 rounded-xl font-medium hover:opacity-90 transition-opacity">
+                    <i class="fas fa-plus mr-2"></i>
+                    New Chat
+                </button>
+            </div>
         </div>
 
         <!-- Sidebar Content: Chat History -->
         <div class="p-6 flex-1 flex flex-col overflow-hidden">
             <!-- Chat History Section -->
             <div class="mb-4 flex-1 flex flex-col overflow-hidden">
-                <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center flex-shrink-0">
-                    <i class="fas fa-history text-ltuc-primary mr-2"></i>
-                    Chat History
-                </h3>
+                <!-- Chat History Title - Separate Line -->
+                <div class="flex-shrink-0 mb-3">
+                    <h3 class="text-lg font-semibold text-gray-800 flex items-center">
+                        <i class="fas fa-history text-ltuc-primary mr-2"></i>
+                        Chat History
+                    </h3>
+                </div>
 
                 <!-- Scrollable Chat History Container -->
                 <div class="flex-1 overflow-y-auto sidebar-scroll">

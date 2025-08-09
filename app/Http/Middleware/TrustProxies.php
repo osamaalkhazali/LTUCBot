@@ -29,7 +29,7 @@ class TrustProxies
     public function handle(Request $request, Closure $next): Response
     {
         $request->setTrustedProxies($this->proxies, $this->headers);
-        
+
         return $next($request);
     }
 }

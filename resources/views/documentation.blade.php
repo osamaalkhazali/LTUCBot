@@ -117,6 +117,95 @@
             color: #8b949e;
         }
 
+        /* Mobile Navigation Styles */
+        .mobile-menu {
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu.hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .mobile-menu:not(.hidden) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+                padding: 1rem 0;
+            }
+
+            .nav-links a {
+                text-align: center;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
+                width: 100%;
+                min-height: 44px; /* Better touch target */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Ensure mobile menu button is large enough */
+            #mobile-menu-button {
+                min-height: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .toc-container {
+                position: relative !important;
+                max-height: none !important;
+                width: 100% !important;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .flex-col.lg\\:flex-row {
+                flex-direction: column;
+            }
+
+            .lg\\:w-1\\/4 {
+                width: 100% !important;
+            }
+
+            .lg\\:w-3\\/4 {
+                width: 100% !important;
+            }
+
+            #toc-nav.hidden {
+                display: none;
+            }
+
+            #toc-nav:not(.hidden) {
+                display: block;
+            }
+
+            #toc-chevron.rotated {
+                transform: rotate(180deg);
+            }
+
+            #toc-toggle {
+                min-height: 44px; /* Better touch target */
+            }
+        }
+
+        @media (min-width: 769px) {
+            #toc-nav {
+                display: block !important;
+            }
+        }
+
         /* Print Styles */
         @media print {
             .toc-container {
@@ -168,9 +257,18 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-white hover:text-gray-300 focus:outline-none focus:text-gray-300 transition duration-300">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Navigation Links - Desktop -->
                 @if (Route::has('login'))
-                    <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center space-x-4">
                         <a href="{{ route('documentation') }}"
                             class="text-white hover:text-gray-300 transition duration-300 font-medium">
                             Documentation
@@ -196,6 +294,36 @@
                     </div>
                 @endif
             </div>
+
+            <!-- Mobile Navigation Menu -->
+            @if (Route::has('login'))
+                <div id="mobile-menu" class="md:hidden hidden mobile-menu bg-black border-t border-gray-700">
+                    <div class="nav-links flex flex-col space-y-2 px-4 py-4">
+                        <a href="{{ route('documentation') }}"
+                            class="text-white hover:text-gray-300 hover:bg-gray-800 transition duration-300 font-medium">
+                            Documentation
+                        </a>
+                        @auth
+                            <a href="{{ url('/dashboard') }}"
+                                class="text-white hover:text-gray-300 hover:bg-gray-800 transition duration-300 font-medium">
+                                Dashboard
+                            </a>
+                        @else
+                            <a href="{{ route('login') }}"
+                                class="text-white hover:text-gray-300 hover:bg-gray-800 transition duration-300 font-medium">
+                                Log in
+                            </a>
+
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}"
+                                    class="ltuc-primary text-white font-semibold hover:opacity-90 transition duration-300">
+                                    Get Started
+                                </a>
+                            @endif
+                        @endauth
+                    </div>
+                </div>
+            @endif
         </div>
     </nav>
 
@@ -237,11 +365,22 @@
                     <!-- Table of Contents Sidebar -->
                     <div class="lg:w-1/4 bg-gray-50 border-r border-gray-200 toc-container">
                         <div class="p-6">
-                            <h3 class="text-lg font-semibold text-ltuc-dark mb-4 flex items-center">
+                            <!-- Mobile TOC Toggle -->
+                            <button id="toc-toggle" class="lg:hidden w-full flex items-center justify-between text-lg font-semibold text-ltuc-dark mb-4 bg-white border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition">
+                                <div class="flex items-center">
+                                    <i class="fas fa-list mr-2 text-ltuc-primary"></i>
+                                    Table of Contents
+                                </div>
+                                <i class="fas fa-chevron-down text-gray-500 transform transition-transform" id="toc-chevron"></i>
+                            </button>
+
+                            <!-- Desktop TOC Header -->
+                            <h3 class="hidden lg:flex text-lg font-semibold text-ltuc-dark mb-4 items-center">
                                 <i class="fas fa-list mr-2 text-ltuc-primary"></i>
                                 Table of Contents
                             </h3>
-                            <nav class="toc space-y-2">
+
+                            <nav class="toc space-y-2" id="toc-nav">
                                 <a href="#overview" class="block text-sm text-gray-600 hover:text-ltuc-primary py-1 transition">Overview</a>
                                 <a href="#laravel-choice" class="block text-sm text-gray-600 hover:text-ltuc-primary py-1 transition">Why Laravel?</a>
                                 <a href="#features" class="block text-sm text-gray-600 hover:text-ltuc-primary py-1 transition">Features</a>
@@ -1324,6 +1463,62 @@ php artisan test --testsuite=Unit
 
             window.addEventListener('scroll', highlightActiveSection);
             highlightActiveSection(); // Initial call
+        });
+
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+
+                // Close mobile menu when window is resized to desktop size
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth >= 768) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Mobile TOC toggle functionality
+            const tocToggle = document.getElementById('toc-toggle');
+            const tocNav = document.getElementById('toc-nav');
+            const tocChevron = document.getElementById('toc-chevron');
+
+            if (tocToggle && tocNav && tocChevron) {
+                // Initially hide TOC on mobile
+                if (window.innerWidth < 769) {
+                    tocNav.classList.add('hidden');
+                }
+
+                tocToggle.addEventListener('click', function() {
+                    tocNav.classList.toggle('hidden');
+                    tocChevron.classList.toggle('rotated');
+                });
+
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth >= 769) {
+                        tocNav.classList.remove('hidden');
+                        tocChevron.classList.remove('rotated');
+                    } else {
+                        // On mobile, keep the current state
+                        if (!tocNav.classList.contains('hidden')) {
+                            tocChevron.classList.add('rotated');
+                        }
+                    }
+                });
+            }
         });
     </script>
 </body>

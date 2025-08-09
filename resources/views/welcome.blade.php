@@ -106,6 +106,50 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
+
+        /* Mobile Navigation Styles */
+        .mobile-menu {
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu.hidden {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .mobile-menu:not(.hidden) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+                padding: 1rem 0;
+            }
+
+            .nav-links a {
+                text-align: center;
+                padding: 0.75rem 1rem;
+                border-radius: 0.5rem;
+                width: 100%;
+                min-height: 44px; /* Better touch target */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Ensure mobile menu button is large enough */
+            #mobile-menu-button {
+                min-height: 44px;
+                min-width: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -133,9 +177,18 @@
                         </a>
                     </div>
 
-                    <!-- Navigation Links -->
+                    <!-- Mobile menu button -->
+                    <div class="md:hidden">
+                        <button id="mobile-menu-button" class="text-white hover:text-gray-300 focus:outline-none focus:text-gray-300 transition duration-300">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Navigation Links - Desktop -->
                     @if (Route::has('login'))
-                        <div class="flex items-center space-x-4">
+                        <div class="hidden md:flex items-center space-x-4">
                             <a href="{{ route('documentation') }}"
                                 class="text-white hover:text-gray-300 transition duration-300 font-medium">
                                 Documentation
@@ -161,6 +214,36 @@
                         </div>
                     @endif
                 </div>
+
+                <!-- Mobile Navigation Menu -->
+                @if (Route::has('login'))
+                    <div id="mobile-menu" class="md:hidden hidden mobile-menu bg-black border-t border-gray-700">
+                        <div class="nav-links flex flex-col space-y-2 px-4 py-4">
+                            <a href="{{ route('documentation') }}"
+                                class="text-white hover:text-gray-300 hover:bg-gray-800 transition duration-300 font-medium">
+                                Documentation
+                            </a>
+                            @auth
+                                <a href="{{ url('/dashboard') }}"
+                                    class="text-white hover:text-gray-300 hover:bg-gray-800 transition duration-300 font-medium">
+                                    Dashboard
+                                </a>
+                            @else
+                                <a href="{{ route('login') }}"
+                                    class="text-white hover:text-gray-300 hover:bg-gray-800 transition duration-300 font-medium">
+                                    Log in
+                                </a>
+
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}"
+                                        class="ltuc-primary text-white font-semibold hover:opacity-90 transition duration-300">
+                                        Get Started
+                                    </a>
+                                @endif
+                            @endauth
+                        </div>
+                    </div>
+                @endif
             </div>
         </nav>
 
@@ -413,6 +496,34 @@
             </div>
         </footer>
     </div>
+
+    <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+
+                // Close mobile menu when window is resized to desktop size
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth >= 768) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
