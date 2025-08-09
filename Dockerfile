@@ -1,26 +1,28 @@
-# استخدم صورة PHP 8.2 مع CLI
-FROM php:8.2-cli
+# PHP 8.3 CLI (مطلوب لحزمك الحالية)
+FROM php:8.3-cli
 
-# تثبيت الإضافات المطلوبة لـ Laravel + MySQL
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_MEMORY_LIMIT=-1
+
+# حزم لازمة + امتدادات PHP
 RUN apt-get update && apt-get install -y \
-    unzip \
-    libpq-dev \
-    libzip-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    && docker-php-ext-install pdo pdo_mysql zip gd
+    git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libicu-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql zip gd intl bcmath \
+    && rm -rf /var/lib/apt/lists/*
 
-# تثبيت Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# نسخ ملفات المشروع
 WORKDIR /var/www
+
+# استفادة من الكاش: نزّل الديبندنسيز أولًا
+COPY composer.json composer.lock* ./
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+# بعدها انسخ بقية المشروع
 COPY . .
 
-# تثبيت مكتبات Laravel
-RUN composer install --no-dev --optimize-autoloader
-
-# فتح المنفذ وتشغيل Laravel
+# شغّل على المنفذ الذي يوفره Render
 EXPOSE 10000
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan serve --host=0.0.0.0 --port=${PORT}
