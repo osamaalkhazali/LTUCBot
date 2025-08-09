@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>LTUC AI Assistant</title>
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('assets/images/fav.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/fav.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
