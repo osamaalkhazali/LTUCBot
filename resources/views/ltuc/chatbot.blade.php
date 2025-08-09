@@ -1026,10 +1026,7 @@
                         <p class="text-gray-300 text-xs">Ready to help with your questions</p>
                     </div>
                 </div>
-                <div class="flex items-center bg-green-100 px-2 py-1 rounded-full">
-                    <div class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5"></div>
-                    <span class="text-xs text-green-700 font-medium">Active</span>
-                </div>
+                
             </div>
         </div>
 

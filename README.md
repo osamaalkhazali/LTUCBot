@@ -93,44 +93,86 @@ While frameworks like Django and FastAPI are excellent, Laravel provides:
 - **Hosting Flexibility**: Runs on shared hosting to enterprise infrastructure
 - **Community Support**: Large, active community with extensive package ecosystem
 
-## ✨ Features
+## ✨ Comprehensive AI Features
 
 ### 🤖 Core AI Capabilities
 
--   **Advanced Conversational AI** - Powered by OpenAI GPT-4o for natural, intelligent responses
--   **Multi-Modal Processing** - Supports text, images, documents, and spreadsheets
--   **Contextual Understanding** - Maintains conversation context for coherent interactions
--   **Educational Focus** - Specifically tuned for academic and learning scenarios
+-   **Advanced Conversational AI** - Powered by OpenAI GPT-4o for natural, intelligent responses (up to 16,000 tokens)
+-   **GPT-4o Vision Integration** - Advanced image understanding and analysis capabilities
+-   **Contextual Understanding** - Maintains conversation context with full memory retention
+-   **Educational Focus** - Specifically tuned for academic scenarios and learning assistance
+-   **Personalized Learning** - Individual chat history and learning pattern recognition
 
-### 📁 File Processing Support
+### 📁 Advanced File Processing (Up to 10MB per file)
 
--   **Documents**: PDF, DOCX, DOC, TXT, RTF
--   **Spreadsheets**: XLSX, XLS, CSV
--   **Images**: PNG, JPG, JPEG, GIF, BMP, WEBP
--   **Code Files**: PHP, JS, Python, Java, C++, HTML, CSS, JSON, XML
--   **Data Formats**: JSON, XML, YAML, SQL
--   **Archives**: ZIP (content extraction)
--   **Notebooks**: Jupyter notebooks with cell-by-cell analysis
+#### 📄 **Document Processing**
+-   **PDF Files**: Complete text extraction + embedded image analysis
+-   **Microsoft Word**: .docx, .doc with full formatting and image support
+-   **Spreadsheets**: .xlsx, .xls, .csv with data analysis and chart interpretation
+-   **PowerPoint**: .pptx, .ppt presentations with slide-by-slide analysis
+-   **Text Files**: .txt, .rtf, .md, .rst with markdown rendering
 
-### 🔧 Advanced Features
+#### 💻 **Programming & Code Analysis**
+-   **All Programming Languages**: Python, JavaScript, PHP, Java, C/C++, C#, Go, Rust, Swift, Kotlin
+-   **Web Development**: HTML, CSS, SCSS, SASS, TypeScript, Vue, React, Angular
+-   **Backend**: Node.js, Express, Laravel, Django, Flask, Spring, .NET
+-   **Database**: SQL, MySQL, PostgreSQL, MongoDB queries and schema analysis
+-   **Config Files**: JSON, XML, YAML, TOML, ENV, Docker, Kubernetes
+-   **Build Systems**: package.json, composer.json, Makefile, CMakeLists.txt
+-   **Jupyter Notebooks**: .ipynb with cell-by-cell code and markdown analysis
 
--   **Image Analysis** - Extract text and analyze visual content using GPT-4o Vision
--   **Code Block Rendering** - Syntax-highlighted code display with copy functionality
--   **Markdown Support** - Rich text formatting and rendering
--   **File Upload** - Drag-and-drop interface with multiple file support
--   **Responsive Design** - Mobile-first, modern UI with TailwindCSS
--   **User Authentication** - Secure login and registration system
--   **Chat History** - Persistent conversation storage with user accounts
--   **Real-time Processing** - Instant file analysis and AI responses
+#### �️ **Image & Visual Analysis**
+-   **Image Formats**: PNG, JPG, JPEG, GIF, BMP, WEBP, SVG, TIFF
+-   **OCR Capabilities**: Text extraction from handwritten notes and printed documents
+-   **Mathematical Content**: Solve math problems from images and handwritten equations
+-   **Diagrams & Charts**: Analyze flowcharts, UML diagrams, graphs, and technical drawings
+-   **Academic Materials**: Process homework assignments, worksheets, and study materials
 
-### 🎨 User Experience
+### 🎓 Educational & Academic Support
 
--   **Dark Theme Code Blocks** - Professional ChatGPT-like appearance
--   **Gradient Headers** - Beautiful pink-to-purple gradients matching LTUC branding
--   **Interactive Elements** - Hover effects and smooth animations
--   **Mobile Optimized** - Perfect mobile experience with responsive design
--   **Copy to Clipboard** - Easy code and text copying functionality
--   **Demo Mode** - Public demo for non-authenticated users
+#### 📚 **Learning Assistance**
+-   **Homework Help** - Step-by-step problem solving with detailed explanations
+-   **Math & Science** - Calculus, algebra, statistics, physics, chemistry problem solving
+-   **Research Support** - Information synthesis, citation help, and academic writing
+-   **Code Review** - Bug detection, code optimization, and best practice suggestions
+-   **Concept Explanation** - Complex topics broken down into understandable concepts
+
+#### 🔢 **Advanced Math Capabilities**
+-   **LaTeX Formatting** - Beautiful mathematical equation rendering
+-   **Calculus** - Derivatives, integrals, limits, and differential equations
+-   **Linear Algebra** - Matrix operations, eigenvalues, vector spaces
+-   **Statistics** - Data analysis, probability, hypothesis testing
+-   **Discrete Math** - Logic, set theory, graph theory, combinatorics
+
+### 🔧 Technical Features
+
+#### 💾 **Data Management**
+-   **Persistent Chat History** - All conversations saved with full context
+-   **Multiple Chat Sessions** - Organize conversations with custom titles
+-   **File Upload Memory** - System remembers and references uploaded files
+-   **Search Functionality** - Find specific conversations and topics quickly
+
+#### 🎨 **User Interface**
+-   **Mobile-First Design** - Perfect experience on all devices
+-   **Dark Code Blocks** - Professional ChatGPT-like code appearance
+-   **Syntax Highlighting** - Support for 100+ programming languages
+-   **Copy to Clipboard** - One-click copying for code and text
+-   **Drag & Drop** - Intuitive file upload interface
+-   **Real-time Typing** - Live typing indicators and instant responses
+
+#### 🔐 **Security & Performance**
+-   **Laravel Authentication** - Secure user registration and login system
+-   **Rate Limiting** - API throttling for optimal performance and fair usage
+-   **CSRF Protection** - Built-in security against cross-site request forgery
+-   **File Validation** - Secure file upload with type and size validation
+-   **Demo Mode** - Public access for testing without registration
+
+#### 🎨 **LTUC Branding & Design**
+-   **University Colors** - Beautiful pink-to-purple gradients matching LTUC branding
+-   **Professional Layout** - Clean, academic-focused interface design
+-   **Interactive Elements** - Smooth animations and hover effects
+-   **Print-Friendly** - Optimized documentation and chat export functionality
+-   **Accessibility** - WCAG compliant design for all users
 
 ## 🛠 Technologies
 
