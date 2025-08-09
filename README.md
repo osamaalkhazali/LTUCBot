@@ -171,27 +171,52 @@ The project includes comprehensive Docker configuration optimized for production
 
 ### Multi-Stage Dockerfile
 
-Our Dockerfile uses a multi-stage build process:
+Our Dockerfile uses a multi-stage build process for optimal performance:
 
-1. **Stage 1: Asset Building**
-   ```dockerfile
-   FROM node:20 AS assets
-   # Builds Vite assets optimally
-   ```
+**Stage 1: Frontend Asset Building (Node.js 20)**
+```dockerfile
+FROM node:20 AS assets
+# Builds Vite assets with support for npm, yarn, or pnpm
+# Automatically detects package manager and uses frozen lockfiles
+# Outputs optimized production assets
+```
 
-2. **Stage 2: PHP Application**
-   ```dockerfile
-   FROM php:8.3-cli
-   # Installs PHP extensions and dependencies
-   ```
+**Stage 2: PHP Application (PHP 8.3-CLI)**
+```dockerfile
+FROM php:8.3-cli
+# Installs required PHP extensions: PDO, MySQL, GD, ZIP, Intl, BCMath
+# Configures file upload limits (10MB)
+# Optimizes for production with --no-dev dependencies
+```
 
 ### Key Docker Features
 
-- **PHP 8.3** with all required extensions (GD, ZIP, PDO, MySQL, BCMath, Intl)
-- **Composer 2** for dependency management
-- **File Upload Support** - Configured for 10MB max file size
+- **PHP 8.3-CLI** with all required extensions (GD, ZIP, PDO MySQL, BCMath, Intl)
+- **Node.js 20** for modern frontend asset building
+- **Composer 2** for optimized PHP dependency management
+- **Multi-Package Manager Support** - Auto-detects npm, yarn, or pnpm
+- **File Upload Support** - Pre-configured for 10MB max file size
 - **Production Optimized** - No dev dependencies in final image
-- **Multi-platform** - Supports ARM64 and AMD64 architectures
+- **Smart Caching** - Separate layers for dependencies and source code
+- **Flexible Port Configuration** - Uses PORT environment variable
+
+### Docker Configuration Details
+
+```dockerfile
+# PHP Extensions Installed
+pdo pdo_mysql zip gd intl bcmath
+
+# File Upload Settings
+upload_max_filesize = 10M
+post_max_size = 10M
+
+# Production Optimizations
+composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+# Port Configuration
+EXPOSE 10000
+CMD php artisan serve --host=0.0.0.0 --port=${PORT}
+```
 
 ### Quick Docker Commands
 
