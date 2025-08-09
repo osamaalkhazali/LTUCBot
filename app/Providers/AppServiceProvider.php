@@ -26,9 +26,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Configure for production deployments
         if (config('app.env') === 'production') {
-            // Trust proxies for Railway/Render deployments
-            $this->app['request']->setTrustedProxies(['*'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO);
-
             // Force HTTPS for generated URLs
             URL::forceScheme('https');
         }
